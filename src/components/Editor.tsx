@@ -12,6 +12,7 @@ import { serializeState } from '@/lib/storage'
 import { getBeatCount, getTalaName, TalaBase, Jathi } from '@/lib/tala'
 import { stripUndefined } from '@/lib/firestore-utils'
 import MetadataPanel from './MetadataPanel'
+import PrintHeader from './PrintHeader'
 import NotationGrid from './NotationGrid'
 import Toolbar from './Toolbar'
 import PlaybackBar from './PlaybackBar'
@@ -85,16 +86,19 @@ export default function Editor({ cloudId }: Props) {
       avartanamCount: notRows.length,
       isPublic: state.isPublic || false,
       shareId: state.shareId || null,
-      updatedAt: serverTimestamp(),
     }
     try {
+      // Strip undefined BEFORE adding server timestamps — stripUndefined must
+      // never touch the serverTimestamp() FieldValue sentinels or it corrupts them.
       const cleanPayload = stripUndefined(payload)
       if (state.cloudId) {
-        await updateDoc(doc(db, 'compositions', state.cloudId), cleanPayload)
+        await updateDoc(doc(db, 'compositions', state.cloudId), {
+          ...cleanPayload, updatedAt: serverTimestamp(),
+        })
         setSaveIndicator('Saved to cloud ✓')
       } else {
         const ref = await addDoc(collection(db, 'compositions'), {
-          ...cleanPayload, createdAt: serverTimestamp(),
+          ...cleanPayload, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
         })
         dispatch({ type: 'SET_CLOUD_ID', cloudId: ref.id })
         router.replace(`/compose/${ref.id}`)
@@ -187,6 +191,9 @@ export default function Editor({ cloudId }: Props) {
       )}
 
       <MetadataPanel />
+
+      {/* Print-only header: song name, ragam, talam, composer, raga info */}
+      <PrintHeader />
 
       <Toolbar
         zoom={zoom}

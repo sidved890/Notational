@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { User, onAuthStateChanged, signOut } from 'firebase/auth'
 import {
-  collection, query, where, orderBy, limit, getDocs, addDoc, deleteDoc, doc, serverTimestamp,
+  collection, query, where, getDocs, deleteDoc, doc,
 } from 'firebase/firestore'
 import { getFirebaseAuth, getFirebaseDb } from '@/lib/firebase'
 import { CloudComposition } from '@/lib/types'
@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [showAuth, setShowAuth] = useState(false)
   const [compositions, setCompositions] = useState<CloudComposition[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState('')
   const [darkMode, setDarkMode] = useState(false)
 
   useEffect(() => {
@@ -46,16 +47,22 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) { setCompositions([]); return }
     setLoading(true)
+    setLoadError('')
     const db = getFirebaseDb()
-    const q = query(
-      collection(db, 'compositions'),
-      where('uid', '==', user.uid),
-      orderBy('updatedAt', 'desc'),
-      limit(50)
-    )
+    // Filter by uid only — sorting is done client-side so this query needs no
+    // composite index (where + orderBy would require one, and the silent
+    // failure left the dashboard empty even after a successful save).
+    const q = query(collection(db, 'compositions'), where('uid', '==', user.uid))
     getDocs(q)
-      .then((snap) => setCompositions(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<CloudComposition, 'id'>) }))))
-      .catch(console.error)
+      .then((snap) => {
+        const items = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<CloudComposition, 'id'>) }))
+        items.sort((a, b) => (b.updatedAt?.toDate?.()?.getTime() ?? 0) - (a.updatedAt?.toDate?.()?.getTime() ?? 0))
+        setCompositions(items.slice(0, 50))
+      })
+      .catch((err) => {
+        console.error(err)
+        setLoadError(err instanceof Error ? err.message : 'Failed to load compositions.')
+      })
       .finally(() => setLoading(false))
   }, [user])
 
@@ -152,6 +159,17 @@ export default function Dashboard() {
           </div>
         ) : loading ? (
           <div style={{ textAlign: 'center', padding: 60, color: 'var(--ink-faint)', fontStyle: 'italic' }}>Loading…</div>
+        ) : loadError ? (
+          <div style={{
+            textAlign: 'center', padding: '40px 20px',
+            background: 'rgba(192,57,43,0.06)', borderRadius: 12,
+            border: '1.5px dashed rgba(192,57,43,0.4)',
+          }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, color: '#c0392b', fontStyle: 'italic', marginBottom: 10 }}>
+              Couldn’t load your compositions
+            </div>
+            <p style={{ color: 'var(--ink-faint)', fontSize: 13, fontFamily: 'monospace', wordBreak: 'break-word' }}>{loadError}</p>
+          </div>
         ) : compositions.length === 0 ? (
           <div style={{
             textAlign: 'center', padding: '60px 20px',

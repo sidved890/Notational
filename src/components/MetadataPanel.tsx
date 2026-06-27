@@ -23,22 +23,6 @@ export default function MetadataPanel() {
         Composition Details
       </h2>
 
-      {/* Print header — only visible on print */}
-      <div className="print-header" style={{ display: 'none' }}>
-        <div className="print-title">{meta.name || 'Untitled'}</div>
-        <div className="print-subtitle">
-          {[meta.ragam, getTalaDisplay(meta), meta.composer].filter(Boolean).join('  ·  ')}
-        </div>
-        {(meta.arohanam || meta.avarohanam) && (
-          <div className="print-raga-info">
-            {meta.melakarta && <span><em>Melakarta:</em> {meta.melakarta} · </span>}
-            {meta.isJanya && meta.janyaParent && <span><em>Janya of:</em> {meta.janyaParent} · </span>}
-            {meta.arohanam && <span><em>Ā:</em> {meta.arohanam} · </span>}
-            {meta.avarohanam && <span><em>Av:</em> {meta.avarohanam}</span>}
-          </div>
-        )}
-      </div>
-
       <div className="metadata-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px 24px' }}>
         <FieldGroup label="Song Name">
           <input className="field-input" type="text" value={meta.name} placeholder="e.g. Vataapi Ganapatim Bhaje" onChange={(e) => update('name', e.target.value)} />
@@ -136,23 +120,6 @@ export default function MetadataPanel() {
       `}</style>
     </div>
   )
-}
-
-function getTalaDisplay(meta: { talaBase?: string; jathi?: string; kalai?: number }) {
-  const { talaBase = '', jathi = '', kalai = 1 } = meta
-  if (!talaBase) return ''
-  const names: Record<string, string> = {
-    triputa: 'Triputa', rupaka: 'Rupaka', dhruva: 'Dhruva',
-    matya: 'Matya', eka: 'Eka', jhampa: 'Jhampa', ata: 'Ata',
-    misra_chapu: 'Misra Chapu', khanda_chapu: 'Khanda Chapu', rupaka_traditional: 'Rupaka (Trad.)',
-  }
-  const jathiNames: Record<string, string> = {
-    tisra: 'Tisra', chaturasra: 'Chatusra', khanda: 'Khanda', misra: 'Misra', sankeerna: 'Sankeerna',
-  }
-  const talaPart = ['misra_chapu', 'khanda_chapu', 'rupaka_traditional'].includes(talaBase)
-    ? (names[talaBase] || talaBase)
-    : `${jathiNames[jathi] || jathi} Jati ${names[talaBase] || talaBase}`
-  return kalai === 2 ? `${talaPart} (Kalai 2)` : talaPart
 }
 
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
