@@ -111,21 +111,21 @@ export default function MetadataPanel() {
           </div>
 
           <FieldGroup label="Melakarta">
-            <input className="field-input" type="text" value={meta.melakarta || ''} placeholder="e.g. 29 · Sankarabharanam" onChange={(e) => update('melakarta', e.target.value)} />
+            <input id="raga-melakarta" name="raga-melakarta" autoComplete="off" className="field-input" type="text" value={meta.melakarta || ''} placeholder="e.g. 29 · Sankarabharanam" onChange={(e) => update('melakarta', e.target.value)} />
           </FieldGroup>
 
           {meta.isJanya && (
             <FieldGroup label="Janya of (Parent Raga)">
-              <input className="field-input" type="text" value={meta.janyaParent || ''} placeholder="e.g. Kharaharapriya" onChange={(e) => update('janyaParent', e.target.value)} />
+              <input id="raga-janya-parent" name="raga-janya-parent" autoComplete="off" className="field-input" type="text" value={meta.janyaParent || ''} placeholder="e.g. Kharaharapriya" onChange={(e) => update('janyaParent', e.target.value)} />
             </FieldGroup>
           )}
 
           <FieldGroup label="Arohanam (Ascending)">
-            <input className="field-input" type="text" value={meta.arohanam || ''} placeholder="e.g. S R2 G3 M1 P D2 N3 Ṡ" onChange={(e) => update('arohanam', e.target.value)} style={{ fontFamily: 'var(--font-serif)' }} />
+            <input id="raga-arohanam" name="raga-arohanam" autoComplete="off" className="field-input" type="text" value={meta.arohanam || ''} placeholder="e.g. S R2 G3 M1 P D2 N3 Ṡ" onChange={(e) => update('arohanam', e.target.value)} style={{ fontFamily: 'var(--font-serif)' }} />
           </FieldGroup>
 
           <FieldGroup label="Avarohanam (Descending)">
-            <input className="field-input" type="text" value={meta.avarohanam || ''} placeholder="e.g. Ṡ N3 D2 P M1 G3 R2 S" onChange={(e) => update('avarohanam', e.target.value)} style={{ fontFamily: 'var(--font-serif)' }} />
+            <input id="raga-avarohanam" name="raga-avarohanam" autoComplete="off" className="field-input" type="text" value={meta.avarohanam || ''} placeholder="e.g. Ṡ N3 D2 P M1 G3 R2 S" onChange={(e) => update('avarohanam', e.target.value)} style={{ fontFamily: 'var(--font-serif)' }} />
           </FieldGroup>
         </div>
       )}

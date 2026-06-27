@@ -95,6 +95,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
           <button className="btn btn-icon btn-secondary" onClick={() => setDarkMode(d => !d)} title="Toggle dark mode">
             {darkMode ? '☀' : '☽'}
           </button>

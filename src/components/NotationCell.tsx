@@ -137,11 +137,11 @@ export default function NotationCell({
         break
       case 'ArrowDown':
         e.preventDefault()
-        onNavigate(rowIndex, cellIndex, 'down')
+        onNavigate(rowIndex, cellIndex, 'sahitya') // ↓ from swara → sahitya (same cell)
         break
       case 'ArrowUp':
         e.preventDefault()
-        onNavigate(rowIndex, cellIndex, 'up')
+        onNavigate(rowIndex, cellIndex, 'up') // ↑ from swara → previous avartanam
         break
       case 'Tab':
         e.preventDefault()
@@ -172,13 +172,13 @@ export default function NotationCell({
           onNavigate(rowIndex, cellIndex, 'right')
         }
         break
-      case 'ArrowDown':
-        e.preventDefault()
-        onNavigate(rowIndex, cellIndex, 'down')
-        break
       case 'ArrowUp':
         e.preventDefault()
-        onNavigate(rowIndex, cellIndex, 'up')
+        onNavigate(rowIndex, cellIndex, 'swara') // ↑ from sahitya → swara (same cell)
+        break
+      case 'ArrowDown':
+        e.preventDefault()
+        onNavigate(rowIndex, cellIndex, 'right') // ↓ from sahitya → next cell's swara
         break
     }
   }

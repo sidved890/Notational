@@ -10,6 +10,7 @@ import { getFirebaseAuth, getFirebaseDb } from '@/lib/firebase'
 import { useComposition } from '@/context/CompositionContext'
 import { serializeState } from '@/lib/storage'
 import { getBeatCount, getTalaName, TalaBase, Jathi } from '@/lib/tala'
+import { stripUndefined } from '@/lib/firestore-utils'
 import MetadataPanel from './MetadataPanel'
 import NotationGrid from './NotationGrid'
 import Toolbar from './Toolbar'
@@ -87,12 +88,13 @@ export default function Editor({ cloudId }: Props) {
       updatedAt: serverTimestamp(),
     }
     try {
+      const cleanPayload = stripUndefined(payload)
       if (state.cloudId) {
-        await updateDoc(doc(db, 'compositions', state.cloudId), payload)
+        await updateDoc(doc(db, 'compositions', state.cloudId), cleanPayload)
         setSaveIndicator('Saved to cloud ✓')
       } else {
         const ref = await addDoc(collection(db, 'compositions'), {
-          ...payload, createdAt: serverTimestamp(),
+          ...cleanPayload, createdAt: serverTimestamp(),
         })
         dispatch({ type: 'SET_CLOUD_ID', cloudId: ref.id })
         router.replace(`/compose/${ref.id}`)
@@ -147,6 +149,7 @@ export default function Editor({ cloudId }: Props) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)' }}>← Dashboard</a>
+          <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 12, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
           <div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--burgundy)', fontStyle: 'italic' }}>Notational</div>
             <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>
