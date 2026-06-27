@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notational — Carnatic Music Notation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --parchment: #F5EFE0;
+  --parchment-dark: #EDE4CC;
+  --parchment-darker: #E3D8B8;
+  --burgundy: #6B1E2E;
+  --burgundy-light: #8B2E42;
+  --burgundy-dark: #4A1020;
+  --gold: #C9973A;
+  --gold-light: #DEB96A;
+  --gold-pale: #F0D98A;
+  --gold-faint: rgba(201,151,58,0.12);
+  --ink: #2A1A0E;
+  --ink-light: #5A3A28;
+  --ink-faint: rgba(42,26,14,0.4);
+  --beat-divider: rgba(201,151,58,0.5);
+  --cell-border: rgba(107,30,46,0.2);
+  --focus-glow: rgba(201,151,58,0.6);
+  --shadow: rgba(42,26,14,0.15);
+  --font-serif: 'Noto Serif', 'Libre Baskerville', Georgia, serif;
+  --font-display: 'IM Fell English', 'Crimson Pro', Georgia, serif;
+  --font-ui: 'Crimson Pro', 'Noto Serif', Georgia, serif;
+}
+
+body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════════════
+   DARK MODE
+═══════════════════════════════════════════════════════ */
+body.dark {
+  --parchment: #1A1208;
+  --parchment-dark: #221A0E;
+  --parchment-darker: #2A2012;
+  --ink: #E8DCC8;
+  --ink-light: #C8B898;
+  --ink-faint: rgba(232,220,200,0.4);
+  --cell-border: rgba(201,151,58,0.25);
+  --shadow: rgba(0,0,0,0.4);
+}
+
+body.dark .metadata-panel,
+body.dark .grid-wrapper,
+body.dark .beat-header-row {
+  background: var(--parchment-dark);
+  border-color: rgba(201,151,58,0.3);
+}
+
+body.dark .cell-swara,
+body.dark .cell-sahitya {
+  background: var(--parchment);
+  color: var(--ink);
+}
+
+body.dark .beat-group {
+  background: rgba(201,151,58,0.05);
+}
+
+body.dark .beat-group:nth-child(even) {
+  background: rgba(201,151,58,0.09);
+}
+
+/* ═══════════════════════════════════════════════════════
+   APP LAYOUT
+═══════════════════════════════════════════════════════ */
+#app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════════════ */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--gold);
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--burgundy);
+  letter-spacing: 0.04em;
+  font-style: italic;
+}
+
+.app-title span {
+  font-style: normal;
+  color: var(--gold);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: block;
+  font-family: var(--font-ui);
+  margin-top: -2px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn {
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1.5px solid;
+  letter-spacing: 0.03em;
+}
+
+.btn-primary {
+  background: var(--burgundy);
+  border-color: var(--burgundy);
+  color: var(--parchment);
+}
+.btn-primary:hover { background: var(--burgundy-light); }
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--burgundy);
+  color: var(--burgundy);
+}
+.btn-secondary:hover { background: rgba(107,30,46,0.08); }
+
+.btn-gold {
+  background: transparent;
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.btn-gold:hover { background: var(--gold-faint); }
+
+.btn-icon {
+  padding: 7px 10px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════
+   METADATA PANEL
+═══════════════════════════════════════════════════════ */
+.metadata-panel {
+  background: linear-gradient(135deg, var(--parchment-dark) 0%, var(--parchment) 100%);
+  border: 1.5px solid rgba(201,151,58,0.4);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.metadata-panel h2 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--burgundy);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  font-style: italic;
+}
+
+.metadata-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field-group label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--burgundy);
+  opacity: 0.8;
+}
+
+.field-input {
+  padding: 8px 12px;
+  background: var(--parchment);
+  border: 1.5px solid rgba(107,30,46,0.25);
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201,151,58,0.2);
+}
+
+select.field-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B1E2E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+/* Segmented control for Kalai */
+.segmented-control {
+  display: flex;
+  border: 1.5px solid rgba(107,30,46,0.25);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--parchment);
+}
+
+.segmented-control input[type="radio"] { display: none; }
+
+.segmented-control label {
+  flex: 1;
+  text-align: center;
+  padding: 8px 12px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-light);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: none;
+  letter-spacing: 0;
+  border-right: 1.5px solid rgba(107,30,46,0.2);
+  opacity: 1;
+}
+
+.segmented-control label:last-of-type { border-right: none; }
+
+.segmented-control input[type="radio"]:checked + label {
+  background: var(--burgundy);
+  color: var(--parchment);
+}
+
+/* ═══════════════════════════════════════════════════════
+   TOOLBAR
+═══════════════════════════════════════════════════════ */
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.save-indicator {
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-style: italic;
+  margin-left: auto;
+}
+
+.save-indicator.saved {
+  color: #5A8A3A;
+}
+
+#file-load-input { display: none; }
+
+/* ═══════════════════════════════════════════════════════
+   GRID SECTION
+═══════════════════════════════════════════════════════ */
+.grid-section { margin-bottom: 24px; }
+
+.grid-header-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.grid-title-info {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--ink);
+  font-style: italic;
+}
+
+.kalai-badge {
+  display: none;
+  background: linear-gradient(135deg, var(--gold), #B8820A);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-family: var(--font-ui);
+  font-style: normal;
+}
+
+.kalai-badge.visible { display: inline-block; }
+
+.grid-wrapper {
+  background: var(--parchment-dark);
+  border: 1.5px solid rgba(201,151,58,0.4);
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+/* ═══════════════════════════════════════════════════════
+   AVARTANAM ROW
+═══════════════════════════════════════════════════════ */
+.avartanam-container {
+  border-bottom: 1.5px solid rgba(201,151,58,0.3);
+}
+
+.avartanam-container:last-child { border-bottom: none; }
+
+/* Beat header row */
+.beat-header-row {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to bottom, rgba(107,30,46,0.06), transparent);
+  border-bottom: 1px solid rgba(107,30,46,0.15);
+  min-width: max-content;
+}
+
+.avartanam-label {
+  width: 48px;
+  min-width: 48px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--burgundy);
+  opacity: 0.6;
+  text-align: center;
+  padding: 4px 2px;
+  flex-shrink: 0;
+}
+
+.beat-header-group {
+  display: flex;
+  align-items: center;
+  border-left: 2px solid var(--beat-divider);
+}
+
+.beat-header-cell {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  padding: 4px 0;
+  opacity: 0.9;
+}
+
+/* Notation row */
+.notation-row {
+  display: flex;
+  align-items: stretch;
+  min-width: max-content;
+}
+
+.row-label {
+  width: 48px;
+  min-width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--ink-faint);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  padding: 2px;
+  border-right: 1px solid rgba(201,151,58,0.2);
+}
+
+/* Beat group */
+.beat-group {
+  display: flex;
+  border-left: 2px solid var(--beat-divider);
+}
+
+.beat-group:nth-child(even) {
+  background: rgba(107,30,46,0.03);
+}
+
+/* Individual cell */
+.notation-cell {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--cell-border);
+  position: relative;
+}
+
+.notation-cell:last-child { border-right: none; }
+
+.cell-swara,
+.cell-sahitya {
+  display: block;
+  border: none;
+  background: transparent;
+  font-family: var(--font-serif);
+  color: var(--ink);
+  text-align: center;
+  width: 100%;
+  padding: 3px 4px;
+  outline: none;
+  min-width: 0;
+  caret-color: var(--burgundy);
+}
+
+.cell-swara {
+  font-size: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(107,30,46,0.1);
+  height: 32px;
+}
+
+.cell-sahitya {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ink-light);
+  opacity: 0.75;
+  height: 24px;
+}
+
+.notation-cell:focus-within {
+  background: rgba(201,151,58,0.12);
+  box-shadow: inset 0 0 0 1.5px var(--gold);
+  z-index: 1;
+}
+
+.notation-cell:focus-within .cell-swara { color: var(--ink); }
+
+.cell-swara:focus,
+.cell-sahitya:focus {
+  background: rgba(201,151,58,0.08);
+}
+
+/* Sangati toggle */
+.notation-cell.sangati {
+  background: rgba(107,30,46,0.05);
+}
+.notation-cell.sangati .cell-swara {
+  color: var(--burgundy);
+  font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════
+   ADD AVARTANAM BUTTON ROW
+═══════════════════════════════════════════════════════ */
+.add-row {
+  padding: 8px 12px;
+  border-top: 1px dashed rgba(201,151,58,0.4);
+  text-align: center;
+}
+
+.btn-add-avartanam {
+  background: transparent;
+  border: none;
+  color: var(--gold);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 20px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  transition: background 0.15s;
+}
+.btn-add-avartanam:hover { background: var(--gold-faint); }
+
+/* ═══════════════════════════════════════════════════════
+   PLAYBACK BAR
+═══════════════════════════════════════════════════════ */
+.playback-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--parchment-dark), var(--parchment));
+  border: 1.5px solid rgba(201,151,58,0.3);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.playback-bar label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--burgundy);
+}
+
+.bpm-input {
+  width: 70px;
+  padding: 5px 8px;
+  background: var(--parchment);
+  border: 1.5px solid rgba(107,30,46,0.25);
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+  text-align: center;
+}
+
+.bpm-input:focus { outline: none; border-color: var(--gold); }
+
+.playback-btn {
+  padding: 6px 18px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1.5px solid;
+  letter-spacing: 0.05em;
+}
+
+.play-btn { background: var(--burgundy); border-color: var(--burgundy); color: var(--parchment); }
+.play-btn:hover { background: var(--burgundy-light); }
+.stop-btn { background: transparent; border-color: var(--gold); color: var(--gold); }
+.stop-btn:hover { background: var(--gold-faint); }
+
+.playback-cell-highlight {
+  outline: 3px solid var(--gold) !important;
+  outline-offset: -2px;
+  background: rgba(201,151,58,0.25) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   KEYBINDING HELP PANEL
+═══════════════════════════════════════════════════════ */
+.help-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,18,8,0.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-overlay.active { display: flex; }
+
+.help-panel {
+  background: var(--parchment);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 32px 36px;
+  max-width: 560px;
+  width: 90%;
+  box-shadow: 0 8px 40px rgba(42,26,14,0.35);
+  position: relative;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.help-panel h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--burgundy);
+  margin-bottom: 20px;
+  font-style: italic;
+  border-bottom: 1px solid rgba(201,151,58,0.4);
+  padding-bottom: 10px;
+}
+
+.help-section {
+  margin-bottom: 20px;
+}
+
+.help-section h3 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.help-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.help-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(201,151,58,0.15);
+  vertical-align: middle;
+}
+
+.help-table td:first-child {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--burgundy);
+  white-space: nowrap;
+  padding-right: 16px;
+}
+
+kbd {
+  display: inline-block;
+  background: var(--parchment-dark);
+  border: 1.5px solid rgba(107,30,46,0.3);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--burgundy);
+  box-shadow: 0 1px 0 rgba(107,30,46,0.2);
+}
+
+.help-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: var(--ink-faint);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+.help-close:hover { color: var(--burgundy); }
+
+/* ═══════════════════════════════════════════════════════
+   SWARA INPUT TOOLTIP
+═══════════════════════════════════════════════════════ */
+.cell-swara[title]:focus::after {
+  content: "Press ? for shortcuts";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--burgundy);
+  color: var(--parchment);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRINT STYLES
+═══════════════════════════════════════════════════════ */
+@media print {
+  .app-header,
+  .toolbar,
+  .playback-bar,
+  .add-row,
+  .help-overlay,
+  .header-actions,
+  .btn,
+  .save-indicator {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+    font-size: 12px;
+  }
+
+  .metadata-panel {
+    border: 1px solid #999;
+    box-shadow: none;
+    background: white;
+    page-break-inside: avoid;
+  }
+
+  .grid-wrapper {
+    border: 1px solid #999;
+    box-shadow: none;
+    background: white;
+    overflow: visible;
+  }
+
+  .avartanam-container { page-break-inside: avoid; }
+
+  .cell-swara { font-size: 12px; }
+  .cell-sahitya { font-size: 10px; }
+
+  .notation-cell:focus-within { box-shadow: none; background: transparent; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLLBAR STYLING
+═══════════════════════════════════════════════════════ */
+.grid-wrapper::-webkit-scrollbar { height: 6px; }
+.grid-wrapper::-webkit-scrollbar-track { background: var(--parchment-dark); }
+.grid-wrapper::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; opacity: 0.5; }
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .metadata-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .metadata-grid { grid-template-columns: 1fr; }
+  .app-header { flex-wrap: wrap; gap: 12px; }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-title">
+      Notational
+      <span>Carnatic Music Notation System</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-icon btn-secondary" id="dark-toggle" title="Toggle dark mode">☽</button>
+      <button class="btn btn-icon btn-secondary" id="help-btn" title="Keyboard shortcuts (?)">?</button>
+    </div>
+  </header>
+
+  <!-- METADATA -->
+  <div class="metadata-panel">
+    <h2>Composition Details</h2>
+    <div class="metadata-grid">
+      <div class="field-group">
+        <label for="meta-name">Song Name</label>
+        <input id="meta-name" class="field-input" type="text" placeholder="e.g. Vataapi Ganapatim Bhaje" />
+      </div>
+      <div class="field-group">
+        <label for="meta-ragam">Ragam</label>
+        <input id="meta-ragam" class="field-input" type="text" placeholder="e.g. Hamsadhwani" />
+      </div>
+      <div class="field-group">
+        <label for="meta-composer">Composer</label>
+        <input id="meta-composer" class="field-input" type="text" placeholder="e.g. Muthuswami Dikshitar" />
+      </div>
+      <div class="field-group">
+        <label for="meta-talam">Talam</label>
+        <select id="meta-talam" class="field-input">
+          <option value="adi">Adi Talam (8 beats)</option>
+          <option value="rupaka">Rupaka Talam (6 beats)</option>
+          <option value="misra">Misra Chapu (7 beats)</option>
+          <option value="khanda">Khanda Chapu (5 beats)</option>
+          <option value="tisra">Tisra Eka (3 beats)</option>
+          <option value="chatusra">Chatusra Eka (4 beats)</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>Kalai (Speed)</label>
+        <div class="segmented-control">
+          <input type="radio" name="kalai" id="kalai-1" value="1" checked>
+          <label for="kalai-1">1× Normal</label>
+          <input type="radio" name="kalai" id="kalai-2" value="2">
+          <label for="kalai-2">2× Double</label>
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="meta-maatras">Maatras per Beat</label>
+        <input id="meta-maatras" class="field-input" type="number" min="1" max="8" value="2" />
+      </div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <button class="btn btn-primary" id="btn-save">⬇ Save JSON</button>
+    <button class="btn btn-secondary" id="btn-load" onclick="document.getElementById('file-load-input').click()">⬆ Load JSON</button>
+    <input type="file" id="file-load-input" accept=".json">
+    <button class="btn btn-gold" onclick="window.print()">⎙ Print</button>
+    <span class="save-indicator" id="save-indicator">Not yet saved</span>
+  </div>
+
+  <!-- PLAYBACK BAR -->
+  <div class="playback-bar">
+    <label for="bpm-input">BPM</label>
+    <input id="bpm-input" class="bpm-input" type="number" min="20" max="300" value="60">
+    <button class="playback-btn play-btn" id="play-btn">▶ Play</button>
+    <button class="playback-btn stop-btn" id="stop-btn">■ Stop</button>
+    <span id="playback-status" style="font-size:12px; color:var(--ink-faint); font-style:italic;"></span>
+  </div>
+
+  <!-- GRID SECTION -->
+  <div class="grid-section">
+    <div class="grid-header-bar">
+      <div class="grid-title-info" id="grid-info">Adi Talam · 8 beats · 2 maatras/beat</div>
+      <div class="kalai-badge" id="kalai-badge">Kalai 2</div>
+    </div>
+    <div class="grid-wrapper">
+      <div id="grid-root"></div>
+      <div class="add-row">
+        <button class="btn-add-avartanam" id="btn-add-avartanam">+ Add Avartanam</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- HELP OVERLAY -->
+<div class="help-overlay" id="help-overlay">
+  <div class="help-panel">
+    <button class="help-close" id="help-close">×</button>
+    <h2>Keyboard Shortcuts</h2>
+
+    <div class="help-section">
+      <h3>Special Characters (Swara fields only)</h3>
+      <table class="help-table">
+        <tr><td><kbd>,</kbd></td><td>Karvai — elongation mark (ↄ)</td></tr>
+      </table>
+    </div>
+
+    <div class="help-section">
+      <h3>Dot Below — Mandra Sthayee (lower octave)</h3>
+      <table class="help-table">
+        <tr><td><kbd>m</kbd><kbd>;</kbd></td><td>m̤ (ma, lower octave)</td></tr>
+        <tr><td><kbd>p</kbd><kbd>;</kbd></td><td>p̤ (pa, lower octave)</td></tr>
+        <tr><td><kbd>d</kbd><kbd>;</kbd></td><td>d̤ (da, lower octave)</td></tr>
+        <tr><td><kbd>n</kbd><kbd>;</kbd></td><td>n̤ (ni, lower octave)</td></tr>
+        <tr><td><kbd>s</kbd><kbd>;</kbd></td><td>s̤ (sa, lower octave)</td></tr>
+      </table>
+    </div>
+
+    <div class="help-section">
+      <h3>Dot Above — Tara Sthayee (upper octave)</h3>
+      <table class="help-table">
+        <tr><td><kbd>s</kbd><kbd>'</kbd></td><td>ṡ (sa, upper octave)</td></tr>
+        <tr><td><kbd>r</kbd><kbd>'</kbd></td><td>ṙ (ri, upper octave)</td></tr>
+        <tr><td><kbd>g</kbd><kbd>'</kbd></td><td>ġ (ga, upper octave)</td></tr>
+        <tr><td><kbd>m</kbd><kbd>'</kbd></td><td>ṁ (ma, upper octave)</td></tr>
+        <tr><td><kbd>p</kbd><kbd>'</kbd></td><td>ṗ (pa, upper octave)</td></tr>
+      </table>
+    </div>
+
+    <div class="help-section">
+      <h3>Navigation</h3>
+      <table class="help-table">
+        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Move between cells (swara row)</td></tr>
+        <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Move up/down between avartanams</td></tr>
+        <tr><td><kbd>Tab</kbd></td><td>Move forward (cell by cell)</td></tr>
+        <tr><td><kbd>Shift+Tab</kbd></td><td>Move backward</td></tr>
+        <tr><td><kbd>Enter</kbd> in swara</td><td>Move to sahitya of same cell</td></tr>
+        <tr><td><kbd>Enter</kbd> in sahitya</td><td>Move to next cell's swara</td></tr>
+        <tr><td><kbd>?</kbd></td><td>Toggle this help panel</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  TALAM DEFINITIONS
+// ═══════════════════════════════════════════════════════
+const TALAMS = {
+  adi:      { name: 'Adi Talam',     beats: 8 },
+  rupaka:   { name: 'Rupaka Talam',  beats: 6 },
+  misra:    { name: 'Misra Chapu',   beats: 7 },
+  khanda:   { name: 'Khanda Chapu',  beats: 5 },
+  tisra:    { name: 'Tisra Eka',     beats: 3 },
+  chatusra: { name: 'Chatusra Eka',  beats: 4 },
+};
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let state = {
+  meta: {
+    name: '',
+    ragam: '',
+    composer: '',
+    talam: 'adi',
+    kalai: 1,
+    maatras: 2,
+  },
+  // grid[avartanam][cellIndex] = { swara, sahitya }
+  grid: [],
+  avartanamCount: 4,
+};
+
+// ═══════════════════════════════════════════════════════
+//  DERIVED HELPERS
+// ═══════════════════════════════════════════════════════
+function effectiveBeats() {
+  return TALAMS[state.meta.talam].beats * state.meta.kalai;
+}
+
+function cellsPerAvartanam() {
+  return effectiveBeats() * state.meta.maatras;
+}
+
+// ═══════════════════════════════════════════════════════
+//  GRID DATA MANAGEMENT
+// ═══════════════════════════════════════════════════════
+function ensureGridSize() {
+  const count = state.avartanamCount;
+  const cells = cellsPerAvartanam();
+  while (state.grid.length < count) {
+    state.grid.push([]);
+  }
+  for (let i = 0; i < count; i++) {
+    while (state.grid[i].length < cells) {
+      state.grid[i].push({ swara: '', sahitya: '' });
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════
+function render() {
+  ensureGridSize();
+  updateGridInfo();
+  renderGrid();
+}
+
+function updateGridInfo() {
+  const t = TALAMS[state.meta.talam];
+  const eBeats = effectiveBeats();
+  const badge = document.getElementById('kalai-badge');
+  const info = document.getElementById('grid-info');
+  info.textContent = `${t.name} · Kalai ${state.meta.kalai} · ${eBeats} beats · ${state.meta.maatras} maatras/beat`;
+  if (state.meta.kalai === 2) {
+    badge.classList.add('visible');
+  } else {
+    badge.classList.remove('visible');
+  }
+}
+
+function renderGrid() {
+  const root = document.getElementById('grid-root');
+  const cells = cellsPerAvartanam();
+  const eBeats = effectiveBeats();
+  const maatras = state.meta.maatras;
+  const cellW = Math.max(44, Math.floor(780 / cells));
+
+  root.innerHTML = '';
+
+  for (let a = 0; a < state.avartanamCount; a++) {
+    const container = document.createElement('div');
+    container.className = 'avartanam-container';
+    container.dataset.avartanam = a;
+
+    // --- Beat header row ---
+    const headerRow = document.createElement('div');
+    headerRow.className = 'beat-header-row';
+
+    const aLabel = document.createElement('div');
+    aLabel.className = 'avartanam-label';
+    aLabel.textContent = `Av ${a + 1}`;
+    headerRow.appendChild(aLabel);
+
+    for (let b = 0; b < eBeats; b++) {
+      const beatHdr = document.createElement('div');
+      beatHdr.className = 'beat-header-group';
+      for (let m = 0; m < maatras; m++) {
+        const hCell = document.createElement('div');
+        hCell.className = 'beat-header-cell';
+        hCell.style.width = cellW + 'px';
+        hCell.textContent = m === 0 ? (b + 1) : '';
+        beatHdr.appendChild(hCell);
+      }
+      headerRow.appendChild(beatHdr);
+    }
+    container.appendChild(headerRow);
+
+    // --- Notation row ---
+    const notationRow = document.createElement('div');
+    notationRow.className = 'notation-row';
+
+    const rowLabel = document.createElement('div');
+    rowLabel.className = 'row-label';
+    notationRow.appendChild(rowLabel);
+
+    for (let b = 0; b < eBeats; b++) {
+      const beatGroup = document.createElement('div');
+      beatGroup.className = 'beat-group';
+
+      for (let m = 0; m < maatras; m++) {
+        const cellIdx = b * maatras + m;
+        const cellData = state.grid[a][cellIdx] || { swara: '', sahitya: '' };
+
+        const cell = document.createElement('div');
+        cell.className = 'notation-cell';
+        cell.style.width = cellW + 'px';
+        cell.dataset.avartanam = a;
+        cell.dataset.cell = cellIdx;
+        if (cellData.sangati) cell.classList.add('sangati');
+
+        const swaraInput = document.createElement('input');
+        swaraInput.className = 'cell-swara';
+        swaraInput.type = 'text';
+        swaraInput.value = cellData.swara || '';
+        swaraInput.autocomplete = 'off';
+        swaraInput.autocorrect = 'off';
+        swaraInput.spellcheck = false;
+        swaraInput.style.width = cellW + 'px';
+        swaraInput.title = 'Swara — Press ? for shortcuts';
+        swaraInput.dataset.avartanam = a;
+        swaraInput.dataset.cell = cellIdx;
+        swaraInput.dataset.type = 'swara';
+
+        const sahityaInput = document.createElement('input');
+        sahityaInput.className = 'cell-sahitya';
+        sahityaInput.type = 'text';
+        sahityaInput.value = cellData.sahitya || '';
+        sahityaInput.autocomplete = 'off';
+        sahityaInput.autocorrect = 'off';
+        sahityaInput.spellcheck = false;
+        sahityaInput.style.width = cellW + 'px';
+        sahityaInput.dataset.avartanam = a;
+        sahityaInput.dataset.cell = cellIdx;
+        sahityaInput.dataset.type = 'sahitya';
+
+        cell.appendChild(swaraInput);
+        cell.appendChild(sahityaInput);
+        beatGroup.appendChild(cell);
+
+        // Input events
+        swaraInput.addEventListener('input', onSwaraInput);
+        swaraInput.addEventListener('keydown', onSwaraKeydown);
+        swaraInput.addEventListener('keyup', onSwaraKeyup);
+        sahityaInput.addEventListener('input', onSahityaInput);
+        sahityaInput.addEventListener('keydown', onSahityaKeydown);
+      }
+
+      notationRow.appendChild(beatGroup);
+    }
+
+    container.appendChild(notationRow);
+    root.appendChild(container);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  INPUT HANDLERS
+// ═══════════════════════════════════════════════════════
+
+// Comma → ↄ (karvai), only in swara
+function onSwaraInput(e) {
+  const input = e.target;
+  const a = parseInt(input.dataset.avartanam);
+  const c = parseInt(input.dataset.cell);
+
+  let val = input.value;
+  // Replace comma with ↄ (U+2184)
+  if (val.includes(',')) {
+    val = val.replaceAll(',', 'ↄ');
+    input.value = val;
+  }
+
+  if (!state.grid[a]) state.grid[a] = [];
+  if (!state.grid[a][c]) state.grid[a][c] = { swara: '', sahitya: '' };
+  state.grid[a][c].swara = val;
+  scheduleSave();
+}
+
+// Dot-below and dot-above substitutions via keyup
+const DOT_BELOW_MAP = {
+  'm': 'ṃ',  // m̤
+  'p': 'p̣',  // p̤
+  'd': 'ḍ',  // d̤
+  'n': 'ṇ',  // n̤
+  's': 'ṣ',  // s̤
+};
+
+const DOT_ABOVE_MAP = {
+  's': 'ṡ',  // ṡ
+  'r': 'ṙ',  // ṙ
+  'g': 'ġ',  // ġ
+  'm': 'ṁ',  // ṁ
+  'p': 'ṗ',  // ṗ
+};
+
+function onSwaraKeyup(e) {
+  const input = e.target;
+  const key = e.key;
+
+  if (key === ';' || key === "'") {
+    const val = input.value;
+    const cursor = input.selectionStart;
+    // Look back one char before the suffix
+    if (cursor >= 2) {
+      const prevChar = val[cursor - 2].toLowerCase();
+      const suffix = val[cursor - 1];
+      let replacement = null;
+
+      if (suffix === ';' && DOT_BELOW_MAP[prevChar]) {
+        replacement = DOT_BELOW_MAP[prevChar];
+      } else if (suffix === "'" && DOT_ABOVE_MAP[prevChar]) {
+        replacement = DOT_ABOVE_MAP[prevChar];
+      }
+
+      if (replacement) {
+        const newVal = val.slice(0, cursor - 2) + replacement + val.slice(cursor);
+        input.value = newVal;
+        // Restore cursor after replacement (replacement might be 1 or 2 chars)
+        const newCursor = cursor - 2 + replacement.length;
+        input.setSelectionRange(newCursor, newCursor);
+
+        // Update state
+        const a = parseInt(input.dataset.avartanam);
+        const c = parseInt(input.dataset.cell);
+        if (!state.grid[a]) state.grid[a] = [];
+        if (!state.grid[a][c]) state.grid[a][c] = { swara: '', sahitya: '' };
+        state.grid[a][c].swara = input.value;
+        scheduleSave();
+      }
+    }
+  }
+}
+
+function onSwaraKeydown(e) {
+  const input = e.target;
+  const a = parseInt(input.dataset.avartanam);
+  const c = parseInt(input.dataset.cell);
+  const cells = cellsPerAvartanam();
+
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    // Move to sahitya of same cell
+    const cell = input.closest('.notation-cell');
+    const sahitya = cell.querySelector('.cell-sahitya');
+    if (sahitya) sahitya.focus();
+    return;
+  }
+
+  if (e.key === 'ArrowRight' && input.selectionStart === input.value.length) {
+    e.preventDefault();
+    navigateToCell(a, c + 1, 'swara');
+    return;
+  }
+
+  if (e.key === 'ArrowLeft' && input.selectionStart === 0) {
+    e.preventDefault();
+    navigateToCell(a, c - 1, 'swara');
+    return;
+  }
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    navigateToCell(a + 1, c, 'swara');
+    return;
+  }
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    navigateToCell(a - 1, c, 'swara');
+    return;
+  }
+
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    if (e.shiftKey) {
+      navigateToCell(a, c - 1, 'swara');
+    } else {
+      // Tab from swara goes to sahitya
+      const cell = input.closest('.notation-cell');
+      const sahitya = cell.querySelector('.cell-sahitya');
+      if (sahitya) sahitya.focus();
+    }
+    return;
+  }
+}
+
+function onSahityaInput(e) {
+  const input = e.target;
+  const a = parseInt(input.dataset.avartanam);
+  const c = parseInt(input.dataset.cell);
+  if (!state.grid[a]) state.grid[a] = [];
+  if (!state.grid[a][c]) state.grid[a][c] = { swara: '', sahitya: '' };
+  state.grid[a][c].sahitya = input.value;
+  scheduleSave();
+}
+
+function onSahityaKeydown(e) {
+  const input = e.target;
+  const a = parseInt(input.dataset.avartanam);
+  const c = parseInt(input.dataset.cell);
+  const cells = cellsPerAvartanam();
+
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    navigateToCell(a, c + 1, 'swara');
+    return;
+  }
+
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    if (e.shiftKey) {
+      const cell = input.closest('.notation-cell');
+      const swara = cell.querySelector('.cell-swara');
+      if (swara) swara.focus();
+    } else {
+      navigateToCell(a, c + 1, 'swara');
+    }
+    return;
+  }
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    navigateToCell(a + 1, c, 'sahitya');
+    return;
+  }
+
+  if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    navigateToCell(a - 1, c, 'sahitya');
+    return;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function navigateToCell(avartanam, cellIdx, type) {
+  const cells = cellsPerAvartanam();
+  let a = avartanam;
+  let c = cellIdx;
+
+  // Wrap around avartanams
+  if (c < 0) {
+    a--;
+    c = cells - 1;
+  } else if (c >= cells) {
+    a++;
+    c = 0;
+  }
+
+  if (a < 0 || a >= state.avartanamCount) return;
+
+  const cellEl = document.querySelector(
+    `.notation-cell[data-avartanam="${a}"][data-cell="${c}"]`
+  );
+  if (!cellEl) return;
+
+  const input = cellEl.querySelector(type === 'swara' ? '.cell-swara' : '.cell-sahitya');
+  if (input) {
+    input.focus();
+    if (type === 'swara') {
+      // Place cursor at end
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  METADATA CHANGE HANDLERS
+// ═══════════════════════════════════════════════════════
+function onMetaChange() {
+  state.meta.name = document.getElementById('meta-name').value;
+  state.meta.ragam = document.getElementById('meta-ragam').value;
+  state.meta.composer = document.getElementById('meta-composer').value;
+  state.meta.talam = document.getElementById('meta-talam').value;
+  state.meta.kalai = parseInt(document.querySelector('input[name="kalai"]:checked').value);
+  state.meta.maatras = parseInt(document.getElementById('meta-maatras').value) || 2;
+  scheduleSave();
+}
+
+function onGridConfigChange() {
+  onMetaChange();
+  render();
+}
+
+// ═══════════════════════════════════════════════════════
+//  SAVE / LOAD
+// ═══════════════════════════════════════════════════════
+let saveTimer = null;
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(autoSave, 600);
+}
+
+function autoSave() {
+  try {
+    const data = getCompositionData();
+    localStorage.setItem('notational_autosave', JSON.stringify(data));
+    const el = document.getElementById('save-indicator');
+    const now = new Date();
+    el.textContent = `Autosaved ${now.toLocaleTimeString()}`;
+    el.classList.add('saved');
+    setTimeout(() => el.classList.remove('saved'), 2000);
+  } catch (err) {
+    console.warn('Autosave failed:', err);
+  }
+}
+
+function getCompositionData() {
+  // Sync grid data from DOM before serializing
+  syncGridFromDOM();
+  return {
+    version: 1,
+    meta: { ...state.meta },
+    avartanamCount: state.avartanamCount,
+    grid: state.grid.map(row => row.map(cell => ({ ...cell }))),
+  };
+}
+
+function syncGridFromDOM() {
+  document.querySelectorAll('.cell-swara').forEach(input => {
+    const a = parseInt(input.dataset.avartanam);
+    const c = parseInt(input.dataset.cell);
+    if (state.grid[a] && state.grid[a][c] !== undefined) {
+      state.grid[a][c].swara = input.value;
+    }
+  });
+  document.querySelectorAll('.cell-sahitya').forEach(input => {
+    const a = parseInt(input.dataset.avartanam);
+    const c = parseInt(input.dataset.cell);
+    if (state.grid[a] && state.grid[a][c] !== undefined) {
+      state.grid[a][c].sahitya = input.value;
+    }
+  });
+}
+
+document.getElementById('btn-save').addEventListener('click', () => {
+  const data = getCompositionData();
+  const name = state.meta.name.trim() || 'composition';
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${name}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('file-load-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      loadComposition(data);
+    } catch (err) {
+      alert('Could not parse the file. Please ensure it is a valid Notational JSON file.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+function loadComposition(data) {
+  if (!data.meta || !data.grid) {
+    alert('Invalid composition file format.');
+    return;
+  }
+  state.meta = { ...state.meta, ...data.meta };
+  state.avartanamCount = data.avartanamCount || 4;
+  state.grid = data.grid;
+
+  // Update metadata fields
+  document.getElementById('meta-name').value = state.meta.name || '';
+  document.getElementById('meta-ragam').value = state.meta.ragam || '';
+  document.getElementById('meta-composer').value = state.meta.composer || '';
+  document.getElementById('meta-talam').value = state.meta.talam || 'adi';
+  document.getElementById('meta-maatras').value = state.meta.maatras || 2;
+  const kalaiVal = state.meta.kalai || 1;
+  document.querySelector(`input[name="kalai"][value="${kalaiVal}"]`).checked = true;
+
+  render();
+}
+
+// ═══════════════════════════════════════════════════════
+//  ADD AVARTANAM
+// ═══════════════════════════════════════════════════════
+document.getElementById('btn-add-avartanam').addEventListener('click', () => {
+  state.avartanamCount++;
+  state.grid.push([]);
+  ensureGridSize();
+  renderGrid();
+  updateGridInfo();
+  scheduleSave();
+
+  // Scroll to new avartanam
+  setTimeout(() => {
+    const containers = document.querySelectorAll('.avartanam-container');
+    const last = containers[containers.length - 1];
+    if (last) last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 50);
+});
+
+// ═══════════════════════════════════════════════════════
+//  PLAYBACK
+// ═══════════════════════════════════════════════════════
+let playbackInterval = null;
+let playbackPos = { a: 0, c: 0 };
+let lastHighlightedCell = null;
+
+document.getElementById('play-btn').addEventListener('click', () => {
+  if (playbackInterval) {
+    clearInterval(playbackInterval);
+    playbackInterval = null;
+    clearHighlight();
+    document.getElementById('play-btn').textContent = '▶ Play';
+    document.getElementById('playback-status').textContent = '';
+    return;
+  }
+
+  const bpm = parseInt(document.getElementById('bpm-input').value) || 60;
+  const msPerCell = (60000 / bpm) / state.meta.maatras;
+  playbackPos = { a: 0, c: 0 };
+
+  document.getElementById('play-btn').textContent = '⏸ Pause';
+
+  playbackInterval = setInterval(() => {
+    clearHighlight();
+    const cellEl = document.querySelector(
+      `.notation-cell[data-avartanam="${playbackPos.a}"][data-cell="${playbackPos.c}"]`
+    );
+    if (cellEl) {
+      cellEl.classList.add('playback-cell-highlight');
+      lastHighlightedCell = cellEl;
+      cellEl.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+
+    const status = `Avartanam ${playbackPos.a + 1}, cell ${playbackPos.c + 1}`;
+    document.getElementById('playback-status').textContent = status;
+
+    // Advance
+    playbackPos.c++;
+    if (playbackPos.c >= cellsPerAvartanam()) {
+      playbackPos.c = 0;
+      playbackPos.a++;
+      if (playbackPos.a >= state.avartanamCount) {
+        playbackPos.a = 0;
+      }
+    }
+  }, msPerCell);
+});
+
+document.getElementById('stop-btn').addEventListener('click', () => {
+  if (playbackInterval) {
+    clearInterval(playbackInterval);
+    playbackInterval = null;
+  }
+  clearHighlight();
+  playbackPos = { a: 0, c: 0 };
+  document.getElementById('play-btn').textContent = '▶ Play';
+  document.getElementById('playback-status').textContent = '';
+});
+
+function clearHighlight() {
+  if (lastHighlightedCell) {
+    lastHighlightedCell.classList.remove('playback-cell-highlight');
+    lastHighlightedCell = null;
+  }
+  document.querySelectorAll('.playback-cell-highlight').forEach(el => {
+    el.classList.remove('playback-cell-highlight');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  DARK MODE
+// ═══════════════════════════════════════════════════════
+const darkToggle = document.getElementById('dark-toggle');
+let darkMode = localStorage.getItem('notational_dark') === 'true';
+if (darkMode) document.body.classList.add('dark');
+
+darkToggle.addEventListener('click', () => {
+  darkMode = !darkMode;
+  document.body.classList.toggle('dark', darkMode);
+  localStorage.setItem('notational_dark', darkMode);
+  darkToggle.textContent = darkMode ? '☀' : '☽';
+});
+
+if (darkMode) darkToggle.textContent = '☀';
+
+// ═══════════════════════════════════════════════════════
+//  HELP PANEL
+// ═══════════════════════════════════════════════════════
+const helpOverlay = document.getElementById('help-overlay');
+const helpBtn = document.getElementById('help-btn');
+const helpClose = document.getElementById('help-close');
+
+function toggleHelp() {
+  helpOverlay.classList.toggle('active');
+}
+
+helpBtn.addEventListener('click', toggleHelp);
+helpClose.addEventListener('click', toggleHelp);
+helpOverlay.addEventListener('click', (e) => {
+  if (e.target === helpOverlay) toggleHelp();
+});
+
+document.addEventListener('keydown', (e) => {
+  // Only trigger ? when NOT in an input/textarea
+  if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+    toggleHelp();
+  }
+  if (e.key === 'Escape' && helpOverlay.classList.contains('active')) {
+    helpOverlay.classList.remove('active');
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  METADATA EVENT LISTENERS
+// ═══════════════════════════════════════════════════════
+document.getElementById('meta-name').addEventListener('input', onMetaChange);
+document.getElementById('meta-ragam').addEventListener('input', onMetaChange);
+document.getElementById('meta-composer').addEventListener('input', onMetaChange);
+document.getElementById('meta-talam').addEventListener('change', onGridConfigChange);
+document.querySelectorAll('input[name="kalai"]').forEach(el =>
+  el.addEventListener('change', onGridConfigChange)
+);
+document.getElementById('meta-maatras').addEventListener('change', onGridConfigChange);
+document.getElementById('meta-maatras').addEventListener('input', onGridConfigChange);
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+function init() {
+  // Try to restore autosave
+  try {
+    const saved = localStorage.getItem('notational_autosave');
+    if (saved) {
+      const data = JSON.parse(saved);
+      loadComposition(data);
+      const el = document.getElementById('save-indicator');
+      el.textContent = 'Restored from autosave';
+      return;
+    }
+  } catch (err) {
+    // Start fresh
+  }
+
+  // Default state
+  state.avartanamCount = 4;
+  ensureGridSize();
+  render();
+}
+
+init();
+</script>
+</body>
+</html>
