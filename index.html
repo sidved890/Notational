@@ -136,6 +136,45 @@ select.field-input {
 .segmented-control label:last-of-type { border-right: none; }
 .segmented-control input[type="radio"]:checked + label { background: var(--burgundy); color: var(--parchment); }
 
+/* ── TALA PICKER ── */
+.tala-picker-group { grid-column: 1 / -1; }
+.tala-picker { background: var(--parchment); border: 1.5px solid rgba(107,30,46,0.25); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.tala-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.tala-preset-btn {
+  padding: 4px 12px; border-radius: 20px; font-family: var(--font-ui); font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: all 0.15s; letter-spacing: 0.04em;
+  border: 1.5px solid rgba(107,30,46,0.3); background: transparent; color: var(--ink-light);
+}
+.tala-preset-btn:hover { border-color: var(--burgundy); color: var(--burgundy); }
+.tala-preset-btn.active { background: var(--burgundy); border-color: var(--burgundy); color: var(--parchment); }
+.tala-custom { display: flex; flex-direction: column; gap: 6px; padding-top: 4px; border-top: 1px solid rgba(201,151,58,0.25); }
+.tala-picker-row { display: flex; align-items: center; gap: 10px; }
+.tala-row-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--burgundy); opacity: 0.7; width: 36px; flex-shrink: 0; }
+.tala-btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
+.tala-base-btn, .tala-jathi-btn {
+  padding: 3px 10px; border-radius: 3px; font-family: var(--font-ui); font-size: 12px;
+  font-weight: 600; cursor: pointer; transition: all 0.15s;
+  border: 1.5px solid rgba(107,30,46,0.25); background: transparent; color: var(--ink-light);
+}
+.tala-base-btn:hover, .tala-jathi-btn:hover { border-color: var(--gold); color: var(--gold); }
+.tala-base-btn.active, .tala-jathi-btn.active { background: var(--gold); border-color: var(--gold); color: white; }
+.tala-summary {
+  font-family: var(--font-serif); font-size: 12px; color: var(--burgundy); font-style: italic;
+  padding-top: 4px; border-top: 1px solid rgba(201,151,58,0.2);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.tala-anga-display { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.tala-anga { display: flex; gap: 1px; align-items: center; }
+.tala-anga-sym {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 2px; font-size: 10px; font-weight: 700;
+  font-family: var(--font-serif); border: 1px solid;
+}
+.tala-anga-sym-X { background: rgba(107,30,46,0.12); border-color: rgba(107,30,46,0.3); color: var(--burgundy); }
+.tala-anga-sym-V { background: rgba(201,151,58,0.15); border-color: rgba(201,151,58,0.4); color: var(--gold); font-style: italic; }
+.tala-anga-sym-n { background: rgba(42,26,14,0.06); border-color: rgba(42,26,14,0.15); color: var(--ink-light); }
+.tala-anga-sep { color: var(--gold); opacity: 0.6; font-size: 14px; margin: 0 2px; }
+
 /* ── TOOLBAR ── */
 .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
 .save-indicator { font-size: 12px; color: var(--ink-faint); font-style: italic; margin-left: auto; }
@@ -411,16 +450,43 @@ kbd { display: inline-block; background: var(--parchment-dark); border: 1.5px so
         <label for="meta-composer">Composer</label>
         <input id="meta-composer" class="field-input" type="text" placeholder="e.g. Muthuswami Dikshitar" />
       </div>
-      <div class="field-group">
-        <label for="meta-talam">Talam</label>
-        <select id="meta-talam" class="field-input">
-          <option value="adi">Adi Talam (8 beats)</option>
-          <option value="rupaka">Rupaka Talam (6 beats)</option>
-          <option value="misra">Misra Chapu (7 beats)</option>
-          <option value="khanda">Khanda Chapu (5 beats)</option>
-          <option value="tisra">Tisra Eka (3 beats)</option>
-          <option value="chatusra">Chatusra Eka (4 beats)</option>
-        </select>
+      <div class="field-group tala-picker-group">
+        <label>Talam</label>
+        <div class="tala-picker" id="tala-picker">
+          <div class="tala-presets">
+            <button class="tala-preset-btn active" data-preset="adi">Adi</button>
+            <button class="tala-preset-btn" data-preset="rupaka_standard">Rupaka</button>
+            <button class="tala-preset-btn" data-preset="rupaka_traditional">Rupaka (Traditional)</button>
+            <button class="tala-preset-btn" data-preset="misra_chapu">Misra Chapu</button>
+            <button class="tala-preset-btn" data-preset="khanda_chapu">Khanda Chapu</button>
+            <button class="tala-preset-btn" data-preset="custom">Custom…</button>
+          </div>
+          <div class="tala-custom" id="tala-custom" style="display:none">
+            <div class="tala-picker-row">
+              <span class="tala-row-label">Base</span>
+              <div class="tala-btn-group" id="base-tala-btns">
+                <button class="tala-base-btn" data-base="dhruva">Dhruva</button>
+                <button class="tala-base-btn" data-base="matya">Matya</button>
+                <button class="tala-base-btn active" data-base="triputa">Triputa</button>
+                <button class="tala-base-btn" data-base="rupaka">Rupaka</button>
+                <button class="tala-base-btn" data-base="eka">Eka</button>
+                <button class="tala-base-btn" data-base="jhampa">Jhampa</button>
+                <button class="tala-base-btn" data-base="ata">Ata</button>
+              </div>
+            </div>
+            <div class="tala-picker-row">
+              <span class="tala-row-label">Jathi</span>
+              <div class="tala-btn-group" id="jathi-btns">
+                <button class="tala-jathi-btn" data-jathi="tisra">Tisra (3)</button>
+                <button class="tala-jathi-btn active" data-jathi="chaturasra">Chatusra (4)</button>
+                <button class="tala-jathi-btn" data-jathi="khanda">Khanda (5)</button>
+                <button class="tala-jathi-btn" data-jathi="misra">Misra (7)</button>
+                <button class="tala-jathi-btn" data-jathi="sankeerna">Sankeerna (9)</button>
+              </div>
+            </div>
+          </div>
+          <div class="tala-summary" id="tala-summary"></div>
+        </div>
       </div>
       <div class="field-group">
         <label>Kalai (Speed)</label>
@@ -432,8 +498,8 @@ kbd { display: inline-block; background: var(--parchment-dark); border: 1.5px so
         </div>
       </div>
       <div class="field-group">
-        <label for="meta-maatras">Maatras per Beat</label>
-        <input id="meta-maatras" class="field-input" type="number" min="1" max="8" value="2" />
+        <label for="meta-maatras">Gathi (Maatras/Beat)</label>
+        <input id="meta-maatras" class="field-input" type="number" min="1" max="9" value="2" />
       </div>
     </div>
   </div>
@@ -603,14 +669,75 @@ if (CLOUD_ENABLED) {
 // ════════════════════════════════════════════════════════════
 //  TALAM DEFINITIONS
 // ════════════════════════════════════════════════════════════
-const TALAMS = {
-  adi:      { name: 'Adi Talam',    beats: 8, pattern: ['X','1','2','3','X','V','X','V'], angas: [4,2,2] },
-  rupaka:   { name: 'Rupaka Talam', beats: 6, pattern: ['X','V','X','1','2','3'],         angas: [2,4] },
-  misra:    { name: 'Misra Chapu',  beats: 7, pattern: ['X','1','2','X','V','X','V'],     angas: [3,2,2] },
-  khanda:   { name: 'Khanda Chapu', beats: 5, pattern: ['X','V','X','1','2'],             angas: [2,3] },
-  tisra:    { name: 'Tisra Eka',    beats: 3, pattern: ['X','1','2'],                     angas: [3] },
-  chatusra: { name: 'Chatusra Eka', beats: 4, pattern: ['X','1','2','3'],                 angas: [4] },
+// ════════════════════════════════════════════════════════════
+//  35-TALA SYSTEM
+// ════════════════════════════════════════════════════════════
+const JATHIS = {
+  tisra:      { name: 'Tisra',     count: 3 },
+  chaturasra: { name: 'Chatusra',  count: 4 },
+  khanda:     { name: 'Khanda',    count: 5 },
+  misra:      { name: 'Misra',     count: 7 },
+  sankeerna:  { name: 'Sankeerna', count: 9 },
 };
+
+const BASE_TALAS = {
+  dhruva:  { name: 'Dhruva',  angas: ['L','D','L','L'] },
+  matya:   { name: 'Matya',   angas: ['L','D','L'] },
+  triputa: { name: 'Triputa', angas: ['L','D','D'] },
+  rupaka:  { name: 'Rupaka',  angas: ['D','L'] },
+  eka:     { name: 'Eka',     angas: ['L'] },
+  jhampa:  { name: 'Jhampa',  angas: ['L','U','D'] },
+  ata:     { name: 'Ata',     angas: ['L','L','D','D'] },
+};
+
+// Special talas outside the sapta tala system
+const SPECIAL_TALAS = {
+  misra_chapu:       { name: 'Misra Chapu',          pattern: ['X','1','2','X','V','X','V'], angaSizes: [3,2,2] },
+  khanda_chapu:      { name: 'Khanda Chapu',          pattern: ['X','V','X','1','2'],         angaSizes: [2,3] },
+  rupaka_traditional:{ name: 'Rupaka (Traditional)',  pattern: ['X','X','V'],                 angaSizes: [1,2] },
+};
+
+// Presets map talaBase+jathi shortcuts
+const TALA_PRESETS = {
+  adi:                { talaBase: 'triputa',           jathi: 'chaturasra' },
+  rupaka_standard:    { talaBase: 'rupaka',            jathi: 'chaturasra' },
+  rupaka_traditional: { talaBase: 'rupaka_traditional',jathi: null },
+  misra_chapu:        { talaBase: 'misra_chapu',       jathi: null },
+  khanda_chapu:       { talaBase: 'khanda_chapu',      jathi: null },
+};
+
+// Legacy format compat
+const LEGACY_TALA_MAP = {
+  adi:      { talaBase: 'triputa',           jathi: 'chaturasra' },
+  rupaka:   { talaBase: 'rupaka',            jathi: 'chaturasra' },
+  misra:    { talaBase: 'misra_chapu',       jathi: null },
+  khanda:   { talaBase: 'khanda_chapu',      jathi: null },
+  tisra:    { talaBase: 'eka',               jathi: 'tisra' },
+  chatusra: { talaBase: 'eka',               jathi: 'chaturasra' },
+};
+
+function laghuPattern(jathi) {
+  const count = JATHIS[jathi].count;
+  return ['X', ...Array.from({ length: count - 1 }, (_, i) => String(i + 1))];
+}
+
+// Returns { name, pattern, angaSizes, beats }
+function buildTalaConfig(talaBase, jathi) {
+  if (SPECIAL_TALAS[talaBase]) {
+    return { name: SPECIAL_TALAS[talaBase].name, ...SPECIAL_TALAS[talaBase] };
+  }
+  const base = BASE_TALAS[talaBase];
+  const L = laghuPattern(jathi);
+  const pattern = [];
+  const angaSizes = [];
+  for (const anga of base.angas) {
+    const ap = anga === 'L' ? L : anga === 'D' ? ['X','V'] : ['X'];
+    pattern.push(...ap);
+    angaSizes.push(ap.length);
+  }
+  const jathiName = JATHIS[jathi]?.name || '';
+  return { name: `${jathiName} Jati ${base.name}`, pattern, angaSizes, beats: pattern.length };
+}
 
 const SECTION_PRESETS = ['Pallavi', 'Anupallavi', 'Charanam', 'Chittaswaram', 'Madhyamakala Sahityam', 'Swarajati', 'Varnam'];
 
@@ -621,7 +748,11 @@ const SECTION_PRESETS = ['Pallavi', 'Anupallavi', 'Charanam', 'Chittaswaram', 'M
 //    { type: 'heading',  label: 'Pallavi' }
 // ════════════════════════════════════════════════════════════
 let state = {
-  meta: { name: '', ragam: '', composer: '', talam: 'adi', kalai: 1, maatras: 2 },
+  meta: {
+    name: '', ragam: '', composer: '',
+    talaBase: 'triputa', jathi: 'chaturasra',
+    kalai: 1, maatras: 2,
+  },
   rows: [],
   cloudId: null,
 };
@@ -631,22 +762,22 @@ let currentZoom = 1.0;
 // ════════════════════════════════════════════════════════════
 //  DERIVED
 // ════════════════════════════════════════════════════════════
-function talam() { return TALAMS[state.meta.talam]; }
-function effectiveBeats() { return talam().beats * state.meta.kalai; }
+function currentTalaConfig() { return buildTalaConfig(state.meta.talaBase, state.meta.jathi); }
+function effectiveBeats() { return currentTalaConfig().beats * state.meta.kalai; }
 function cellsPerAvartanam() { return effectiveBeats() * state.meta.maatras; }
 
 function effectivePattern() {
-  const p = talam().pattern;
-  if (state.meta.kalai === 1) return p;
-  return p.flatMap(s => [s, s]);
+  const { pattern } = currentTalaConfig();
+  if (state.meta.kalai === 1) return pattern;
+  return pattern.flatMap(s => [s, s]);
 }
 
 function angaStartSet() {
+  const { angaSizes } = currentTalaConfig();
   const s = new Set();
-  const angas = talam().angas;
   const k = state.meta.kalai;
   let cum = 0;
-  for (const a of angas) { s.add(cum); cum += a * k; }
+  for (const size of angaSizes) { s.add(cum); cum += size * k; }
   return s;
 }
 
@@ -682,11 +813,37 @@ function render() {
 }
 
 function updateGridInfo() {
-  const t = talam();
+  const cfg = currentTalaConfig();
   const eBeats = effectiveBeats();
   document.getElementById('grid-info').textContent =
-    `${t.name} · Kalai ${state.meta.kalai} · ${eBeats} beats · ${state.meta.maatras} maatras/beat`;
+    `${cfg.name} · Kalai ${state.meta.kalai} · ${eBeats} beats · ${state.meta.maatras} maatras/beat`;
   document.getElementById('kalai-badge').classList.toggle('visible', state.meta.kalai === 2);
+  updateTalaPickerUI();
+}
+
+function updateTalaPickerUI() {
+  const cfg = buildTalaConfig(state.meta.talaBase, state.meta.jathi);
+  // Update summary
+  const summary = document.getElementById('tala-summary');
+  if (!summary) return;
+  const eBeats = cfg.beats * state.meta.kalai;
+  // Build visual anga display
+  const effectiveSizes = state.meta.kalai === 1 ? cfg.angaSizes : cfg.angaSizes.map(s => s * 2);
+  const effPat = state.meta.kalai === 1 ? cfg.pattern : cfg.pattern.flatMap(s => [s, s]);
+  let html = `<span>${cfg.name} · ${eBeats} beats</span><span class="tala-anga-display">`;
+  let pos = 0;
+  effectiveSizes.forEach((size, ai) => {
+    if (ai > 0) html += '<span class="tala-anga-sep">|</span>';
+    html += '<span class="tala-anga">';
+    for (let i = 0; i < size; i++) {
+      const sym = effPat[pos++];
+      const cls = sym === 'X' ? 'tala-anga-sym-X' : sym === 'V' ? 'tala-anga-sym-V' : 'tala-anga-sym-n';
+      html += `<span class="tala-anga-sym ${cls}">${sym}</span>`;
+    }
+    html += '</span>';
+  });
+  html += '</span>';
+  summary.innerHTML = html;
 }
 
 function renderGrid() {
@@ -992,7 +1149,7 @@ function syncMetaFromDOM() {
   state.meta.name = document.getElementById('meta-name').value;
   state.meta.ragam = document.getElementById('meta-ragam').value;
   state.meta.composer = document.getElementById('meta-composer').value;
-  state.meta.talam = document.getElementById('meta-talam').value;
+  // talaBase and jathi are updated directly by the picker buttons
   state.meta.kalai = parseInt(document.querySelector('input[name="kalai"]:checked').value);
   state.meta.maatras = parseInt(document.getElementById('meta-maatras').value) || 2;
 }
@@ -1003,7 +1160,7 @@ function onGridConfigChange() { syncMetaFromDOM(); ensureRowCells(); render(); s
 document.getElementById('meta-name').addEventListener('input', onMetaChange);
 document.getElementById('meta-ragam').addEventListener('input', onMetaChange);
 document.getElementById('meta-composer').addEventListener('input', onMetaChange);
-document.getElementById('meta-talam').addEventListener('change', onGridConfigChange);
+// tala picker handled separately via initTalaPicker()
 document.querySelectorAll('input[name="kalai"]').forEach(el => el.addEventListener('change', onGridConfigChange));
 document.getElementById('meta-maatras').addEventListener('change', onGridConfigChange);
 document.getElementById('meta-maatras').addEventListener('input', onGridConfigChange);
@@ -1039,6 +1196,7 @@ function getCompositionData() {
     ),
     cloudId: state.cloudId,
     avartanamCount: notRows.length,
+    // Legacy compat: include old talam key
     grid: notRows.map(r => r.cells.map(c => ({ swara: c.swara || '', sahitya: c.sahitya || '' }))),
   };
 }
@@ -1077,7 +1235,23 @@ document.getElementById('file-load-input').addEventListener('change', e => {
 
 function loadComposition(data) {
   if (!data.meta) { alert('Invalid composition file.'); return; }
-  state.meta = { ...state.meta, ...data.meta };
+
+  // Merge meta with legacy compat
+  const inMeta = data.meta;
+  if (inMeta.talaBase) {
+    state.meta.talaBase = inMeta.talaBase;
+    state.meta.jathi = inMeta.jathi || 'chaturasra';
+  } else if (inMeta.talam) {
+    // Legacy single-string talam
+    const mapped = LEGACY_TALA_MAP[inMeta.talam] || { talaBase: 'triputa', jathi: 'chaturasra' };
+    state.meta.talaBase = mapped.talaBase;
+    state.meta.jathi = mapped.jathi || 'chaturasra';
+  }
+  state.meta.name = inMeta.name || '';
+  state.meta.ragam = inMeta.ragam || '';
+  state.meta.composer = inMeta.composer || '';
+  state.meta.kalai = inMeta.kalai || 1;
+  state.meta.maatras = inMeta.maatras || 2;
   state.cloudId = data.cloudId || null;
 
   if (data.rows) {
@@ -1097,12 +1271,13 @@ function loadComposition(data) {
 
   ensureRowCells();
 
-  document.getElementById('meta-name').value = state.meta.name || '';
-  document.getElementById('meta-ragam').value = state.meta.ragam || '';
-  document.getElementById('meta-composer').value = state.meta.composer || '';
-  document.getElementById('meta-talam').value = state.meta.talam || 'adi';
-  document.getElementById('meta-maatras').value = state.meta.maatras || 2;
-  document.querySelector(`input[name="kalai"][value="${state.meta.kalai || 1}"]`).checked = true;
+  document.getElementById('meta-name').value = state.meta.name;
+  document.getElementById('meta-ragam').value = state.meta.ragam;
+  document.getElementById('meta-composer').value = state.meta.composer;
+  document.getElementById('meta-maatras').value = state.meta.maatras;
+  document.querySelector(`input[name="kalai"][value="${state.meta.kalai}"]`).checked = true;
+  // Sync tala picker UI
+  syncTalaPickerToState();
 
   render();
   showSaveIndicator('Loaded');
@@ -1120,7 +1295,8 @@ async function saveToCloud() {
     name: state.meta.name || 'Untitled',
     ragam: state.meta.ragam || '',
     composer: state.meta.composer || '',
-    talam: state.meta.talam,
+    talaBase: state.meta.talaBase,
+    jathi: state.meta.jathi,
     kalai: state.meta.kalai,
     maatras: state.meta.maatras,
     rows: state.rows.map(r => r.type === 'heading'
@@ -1156,7 +1332,7 @@ async function loadCloudComposition(id) {
     const doc = await fbDb.collection('compositions').doc(id).get();
     if (!doc.exists) { alert('Not found.'); return; }
     const d = doc.data();
-    loadComposition({ meta: { name: d.name, ragam: d.ragam, composer: d.composer, talam: d.talam, kalai: d.kalai, maatras: d.maatras }, rows: d.rows, avartanamCount: d.avartanamCount, grid: d.grid, cloudId: doc.id });
+    loadComposition({ meta: { name: d.name, ragam: d.ragam, composer: d.composer, talaBase: d.talaBase, jathi: d.jathi, kalai: d.kalai, maatras: d.maatras }, rows: d.rows, avartanamCount: d.avartanamCount, grid: d.grid, cloudId: doc.id });
     closeCloudPanel();
   } catch (e) { console.error('Load failed:', e); alert('Failed to load.'); }
 }
@@ -1278,7 +1454,7 @@ async function openCloudPanel() {
       li.className = 'composition-item';
       li.innerHTML = `
         <div class="composition-item-name">${comp.name || 'Untitled'}</div>
-        <div class="composition-item-meta">${comp.ragam ? comp.ragam + ' · ' : ''}${TALAMS[comp.talam]?.name || comp.talam} · ${comp.avartanamCount || '?'} avartanams</div>`;
+        <div class="composition-item-meta">${comp.ragam ? comp.ragam + ' · ' : ''}${comp.talaBase ? (buildTalaConfig(comp.talaBase, comp.jathi || 'chaturasra').name) : (comp.talam || '')} · ${comp.avartanamCount || '?'} avartanams</div>`;
       li.addEventListener('click', () => loadCloudComposition(comp.id));
       ul.appendChild(li);
     });
@@ -1290,14 +1466,14 @@ function closeCloudPanel() { document.getElementById('cloud-panel-overlay').clas
 document.getElementById('cloud-panel-close').addEventListener('click', closeCloudPanel);
 document.getElementById('cloud-panel-overlay').addEventListener('click', e => { if (e.target === document.getElementById('cloud-panel-overlay')) closeCloudPanel(); });
 document.getElementById('btn-new-composition').addEventListener('click', () => {
-  state = { meta: { name: '', ragam: '', composer: '', talam: 'adi', kalai: 1, maatras: 2 }, rows: [], cloudId: null };
+  state = { meta: { name: '', ragam: '', composer: '', talaBase: 'triputa', jathi: 'chaturasra', kalai: 1, maatras: 2 }, rows: [], cloudId: null };
   initRows(4);
   document.getElementById('meta-name').value = '';
   document.getElementById('meta-ragam').value = '';
   document.getElementById('meta-composer').value = '';
-  document.getElementById('meta-talam').value = 'adi';
   document.getElementById('meta-maatras').value = 2;
   document.querySelector('input[name="kalai"][value="1"]').checked = true;
+  syncTalaPickerToState();
   render();
   closeCloudPanel();
 });
@@ -1413,10 +1589,105 @@ document.addEventListener('keydown', e => {
 });
 
 // ════════════════════════════════════════════════════════════
+//  TALA PICKER
+// ════════════════════════════════════════════════════════════
+function initTalaPicker() {
+  // Preset buttons
+  document.querySelectorAll('.tala-preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const preset = btn.dataset.preset;
+      document.querySelectorAll('.tala-preset-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const customSection = document.getElementById('tala-custom');
+
+      if (preset === 'custom') {
+        customSection.style.display = '';
+        // Don't change talaBase/jathi — keep whatever was set
+      } else {
+        customSection.style.display = 'none';
+        const p = TALA_PRESETS[preset];
+        if (p) {
+          state.meta.talaBase = p.talaBase;
+          if (p.jathi) state.meta.jathi = p.jathi;
+        }
+        // Sync base/jathi buttons
+        syncCustomButtons();
+        onGridConfigChange();
+      }
+    });
+  });
+
+  // Base tala buttons
+  document.querySelectorAll('.tala-base-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.meta.talaBase = btn.dataset.base;
+      document.querySelectorAll('.tala-base-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      clearPresetActive();
+      onGridConfigChange();
+    });
+  });
+
+  // Jathi buttons
+  document.querySelectorAll('.tala-jathi-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.meta.jathi = btn.dataset.jathi;
+      document.querySelectorAll('.tala-jathi-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      clearPresetActive();
+      onGridConfigChange();
+    });
+  });
+}
+
+function clearPresetActive() {
+  document.querySelectorAll('.tala-preset-btn').forEach(b => b.classList.remove('active'));
+  // Mark "custom" as active since user is manually picking
+  const customBtn = document.querySelector('.tala-preset-btn[data-preset="custom"]');
+  if (customBtn) {
+    customBtn.classList.add('active');
+    document.getElementById('tala-custom').style.display = '';
+  }
+}
+
+function syncCustomButtons() {
+  document.querySelectorAll('.tala-base-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.base === state.meta.talaBase)
+  );
+  document.querySelectorAll('.tala-jathi-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.jathi === state.meta.jathi)
+  );
+}
+
+function syncTalaPickerToState() {
+  // Find matching preset
+  let matchedPreset = null;
+  for (const [key, p] of Object.entries(TALA_PRESETS)) {
+    if (p.talaBase === state.meta.talaBase && (!p.jathi || p.jathi === state.meta.jathi)) {
+      matchedPreset = key;
+      break;
+    }
+  }
+
+  document.querySelectorAll('.tala-preset-btn').forEach(b => b.classList.remove('active'));
+  const customSection = document.getElementById('tala-custom');
+
+  if (matchedPreset) {
+    const btn = document.querySelector(`.tala-preset-btn[data-preset="${matchedPreset}"]`);
+    if (btn) { btn.classList.add('active'); customSection.style.display = 'none'; }
+  } else {
+    const customBtn = document.querySelector('.tala-preset-btn[data-preset="custom"]');
+    if (customBtn) { customBtn.classList.add('active'); customSection.style.display = ''; }
+  }
+  syncCustomButtons();
+}
+
+// ════════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════════
 function init() {
   updateAuthUI();
+  initTalaPicker();
   try {
     const saved = localStorage.getItem('notational_autosave');
     if (saved) { loadComposition(JSON.parse(saved)); showSaveIndicator('Restored from autosave'); return; }
