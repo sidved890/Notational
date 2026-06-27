@@ -49,8 +49,11 @@ export function serializeState(state: CompositionState): Record<string, any> {
         : {
             type: 'notation',
             cells: r.cells.map((c) => ({ swara: c.swara || '', sahitya: c.sahitya || '' })),
+            sangathiNumber: r.sangathiNumber,
           }
     ),
+    isPublic: state.isPublic,
+    shareId: state.shareId,
     cloudId: state.cloudId,
     // Backward-compat fields
     avartanamCount: notRows.length,
@@ -64,14 +67,31 @@ export function serializeState(state: CompositionState): Record<string, any> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function deserializeState(data: Record<string, any>): CompositionState {
+  // Handle legacy talam string -> talaBase mapping
+  const LEGACY: Record<string, { talaBase: string; jathi: string }> = {
+    adi: { talaBase: 'triputa', jathi: 'chaturasra' },
+    rupaka: { talaBase: 'rupaka', jathi: 'chaturasra' },
+    misra: { talaBase: 'misra_chapu', jathi: 'chaturasra' },
+    khanda: { talaBase: 'khanda_chapu', jathi: 'chaturasra' },
+    tisra: { talaBase: 'eka', jathi: 'tisra' },
+    chatusra: { talaBase: 'eka', jathi: 'chaturasra' },
+  }
+  const legacy = data.meta?.talam ? (LEGACY[data.meta.talam] || { talaBase: 'triputa', jathi: 'chaturasra' }) : null
+
   const meta = {
-    name: data.meta?.name || '',
-    ragam: data.meta?.ragam || '',
-    composer: data.meta?.composer || '',
-    talaBase: data.meta?.talaBase || (data.meta?.talam === 'adi' ? 'triputa' : data.meta?.talam || 'triputa'),
-    jathi: data.meta?.jathi || 'chaturasra',
-    kalai: (data.meta?.kalai === 2 ? 2 : 1) as 1 | 2,
-    maatras: data.meta?.maatras || 2,
+    name: data.meta?.name || data.name || '',
+    ragam: data.meta?.ragam || data.ragam || '',
+    composer: data.meta?.composer || data.composer || '',
+    talaBase: data.meta?.talaBase || data.talaBase || legacy?.talaBase || 'triputa',
+    jathi: data.meta?.jathi || data.jathi || legacy?.jathi || 'chaturasra',
+    kalai: ((data.meta?.kalai || data.kalai) === 2 ? 2 : 1) as 1 | 2,
+    maatras: data.meta?.maatras || data.maatras || 2,
+    // Raga info
+    melakarta: data.meta?.melakarta || data.melakarta || '',
+    arohanam: data.meta?.arohanam || data.arohanam || '',
+    avarohanam: data.meta?.avarohanam || data.avarohanam || '',
+    isJanya: data.meta?.isJanya || data.isJanya || false,
+    janyaParent: data.meta?.janyaParent || data.janyaParent || '',
   }
 
   let rows: CompositionRow[]
@@ -88,6 +108,7 @@ export function deserializeState(data: Record<string, any>): CompositionState {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (c: any) => ({ swara: c.swara || '', sahitya: c.sahitya || '' })
               ),
+              sangathiNumber: r.sangathiNumber,
             }
     )
   } else if (data.grid) {
@@ -105,5 +126,7 @@ export function deserializeState(data: Record<string, any>): CompositionState {
     meta,
     rows,
     cloudId: data.cloudId || null,
+    isPublic: data.isPublic || false,
+    shareId: data.shareId || undefined,
   }
 }

@@ -207,8 +207,48 @@ kbd {
 /* ── PRINT ── */
 @media print {
   .no-print { display: none !important; }
-  body { background: white; color: black; }
+  body { background: white !important; color: black !important; }
   .cell-swara { font-size: 12px; }
   .cell-sahitya { font-size: 10px; }
-  .grid-zoom-inner { transform: none !important; }
+  .grid-zoom-inner { transform: none !important; width: 100% !important; }
+  .grid-wrapper { border: 1px solid #ccc !important; box-shadow: none !important; }
+  .metadata-panel { border: none !important; box-shadow: none !important; background: white !important; }
+
+  /* Show print-only header */
+  .print-header { display: block !important; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #333; }
+  .print-title {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: black;
+    margin-bottom: 4px;
+  }
+  .print-subtitle {
+    font-family: Georgia, serif;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+  .print-raga-info {
+    font-family: Georgia, serif;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.6;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+    margin-top: 6px;
+  }
+
+  /* Hide AV numbers in print */
+  .avartanam-label-col { display: none !important; }
+
+  /* Tighter grid for print */
+  .avartanam-container { page-break-inside: avoid; }
+  .section-heading-row { page-break-after: avoid; }
+
+  /* Row actions never print */
+  .row-actions { display: none !important; }
 }

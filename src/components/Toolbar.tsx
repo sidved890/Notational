@@ -13,6 +13,7 @@ type Props = {
   onDarkToggle: () => void
   onHelpToggle: () => void
   onSaveCloud?: () => void
+  onShare?: () => void
   isLoggedIn: boolean
 }
 
@@ -25,6 +26,7 @@ export default function Toolbar({
   onDarkToggle,
   onHelpToggle,
   onSaveCloud,
+  onShare,
   isLoggedIn,
 }: Props) {
   const { state, dispatch, saveIndicator } = useComposition()
@@ -96,9 +98,14 @@ export default function Toolbar({
         ⎙ Print
       </button>
 
-      {isLoggedIn && onSaveCloud && (
+      {onSaveCloud && (
         <button className="btn btn-secondary" onClick={onSaveCloud}>
           ☁ Save to Cloud
+        </button>
+      )}
+      {isLoggedIn && onShare && (
+        <button className="btn btn-gold" onClick={onShare} title="Generate a public share link">
+          ↗ Share
         </button>
       )}
 

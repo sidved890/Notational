@@ -7,6 +7,7 @@ export type NotationCell = {
 export type NotationRow = {
   type: 'notation'
   cells: NotationCell[]
+  sangathiNumber?: number // 1 = first version, 2+ = variations
 }
 
 export type HeadingRow = {
@@ -24,16 +25,25 @@ export type CompositionMeta = {
   jathi: string
   kalai: 1 | 2
   maatras: number
+  // Raga overview
+  melakarta?: string
+  arohanam?: string
+  avarohanam?: string
+  isJanya?: boolean
+  janyaParent?: string
 }
 
 export type CompositionState = {
   meta: CompositionMeta
   rows: CompositionRow[]
   cloudId: string | null
+  isPublic?: boolean
+  shareId?: string
 }
 
 export type CloudComposition = {
   id: string
+  uid: string
   name: string
   ragam?: string
   composer?: string
@@ -43,7 +53,10 @@ export type CloudComposition = {
   maatras?: number
   avartanamCount?: number
   rows?: CompositionRow[]
+  isPublic?: boolean
+  shareId?: string
   updatedAt?: { toDate?: () => Date } | null
+  createdAt?: { toDate?: () => Date } | null
 }
 
 export type BeatMarker = {
