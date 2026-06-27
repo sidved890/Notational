@@ -119,6 +119,15 @@ export default function NotationCell({
   function handleSwaraKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     const input = e.currentTarget
     switch (e.key) {
+      case 'Backspace':
+      case 'Delete':
+        // Clear the current swara cell, then move focus to the cell on the left.
+        e.preventDefault()
+        if (input.value !== '') {
+          dispatch({ type: 'UPDATE_CELL', rowIndex, cellIndex, field: 'swara', value: '' })
+        }
+        onNavigate(rowIndex, cellIndex, 'left')
+        break
       case 'Enter':
         e.preventDefault()
         onNavigate(rowIndex, cellIndex, 'sahitya')
@@ -178,7 +187,7 @@ export default function NotationCell({
         break
       case 'ArrowDown':
         e.preventDefault()
-        onNavigate(rowIndex, cellIndex, 'right') // ↓ from sahitya → next cell's swara
+        onNavigate(rowIndex, cellIndex, 'down') // ↓ from sahitya → next avartanam, same column
         break
     }
   }

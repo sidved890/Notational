@@ -20,6 +20,7 @@ export default function AboutPage() {
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
+          <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
           <button
             onClick={() => { const d = !darkMode; setDarkMode(d); localStorage.setItem('notational_dark', String(d)) }}
             style={{ background: 'none', border: '1.5px solid rgba(107,30,46,0.25)', borderRadius: 4, color: 'var(--burgundy)', cursor: 'pointer', padding: '6px 10px', fontSize: 15 }}

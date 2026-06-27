@@ -53,6 +53,7 @@ export type CloudComposition = {
   maatras?: number
   avartanamCount?: number
   rows?: CompositionRow[]
+  folder?: string | null
   isPublic?: boolean
   shareId?: string
   updatedAt?: { toDate?: () => Date } | null

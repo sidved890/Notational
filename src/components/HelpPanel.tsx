@@ -97,10 +97,11 @@ export default function HelpPanel({ isOpen, onClose }: Props) {
 
         <HelpSection title="Navigation">
           <HelpRow shortcut="← →" desc="Move between cells" />
-          <HelpRow shortcut="↑ ↓" desc="Move between avartanams" />
+          <HelpRow shortcut="↑ ↓" desc="Move down the column into the next/previous avartanam" />
           <HelpRow shortcut="Tab / Shift+Tab" desc="Forward / backward" />
           <HelpRow shortcut="Enter in swara" desc="Jump to sahitya" />
           <HelpRow shortcut="Enter in sahitya" desc="Jump to next cell's swara" />
+          <HelpRow shortcut="Delete" desc="Clear the current swara cell, then move left" />
           <HelpRow shortcut="?" desc="Toggle this panel" />
         </HelpSection>
       </div>
