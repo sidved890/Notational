@@ -18,27 +18,23 @@ import Toolbar from './Toolbar'
 import PlaybackBar from './PlaybackBar'
 import HelpPanel from './HelpPanel'
 import AuthModal from './AuthModal'
+import ThemePicker from './ThemePicker'
+import { useTheme } from '@/hooks/useTheme'
 
 type Props = { cloudId: string | null }
 
 export default function Editor({ cloudId }: Props) {
-  const { state, dispatch, setSaveIndicator } = useComposition()
+  const { state, dispatch, setSaveIndicator, canUndo, canRedo } = useComposition()
   const router = useRouter()
 
   const [user, setUser] = useState<User | null>(null)
   const [authLoaded, setAuthLoaded] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const { theme, setTheme } = useTheme()
   const [zoom, setZoom] = useState(1.0)
   const [showHelp, setShowHelp] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
   const [playbackCell, setPlaybackCell] = useState<{ rowIndex: number; cellIndex: number } | null>(null)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
-
-  useEffect(() => { setDarkMode(localStorage.getItem('notational_dark') === 'true') }, [])
-  useEffect(() => {
-    document.body.classList.toggle('dark', darkMode)
-    localStorage.setItem('notational_dark', String(darkMode))
-  }, [darkMode])
 
   useEffect(() => {
     const auth = getFirebaseAuth()
@@ -48,12 +44,23 @@ export default function Editor({ cloudId }: Props) {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') { setShowHelp(false); setShowAuth(false); return }
+      const mod = e.metaKey || e.ctrlKey
+      if (mod && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault()
+        dispatch({ type: e.shiftKey ? 'REDO' : 'UNDO' })
+        return
+      }
+      if (mod && (e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault()
+        dispatch({ type: 'REDO' })
+        return
+      }
       const tag = (e.target as HTMLElement)?.tagName
       if (e.key === '?' && !['INPUT', 'TEXTAREA'].includes(tag)) setShowHelp((v) => !v)
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [])
+  }, [dispatch])
 
   // Sync cloudId from prop into state
   useEffect(() => {
@@ -172,8 +179,8 @@ export default function Editor({ cloudId }: Props) {
           ) : (
             <button className="btn btn-gold" onClick={() => setShowAuth(true)}>☁ Sign in</button>
           ))}
-          <button className="btn btn-icon btn-secondary" onClick={() => setDarkMode(d => !d)} title="Dark mode">{darkMode ? '☀' : '☽'}</button>
           <button className="btn btn-icon btn-secondary" onClick={() => setShowHelp(v => !v)} title="Shortcuts (?)">?</button>
+          <ThemePicker theme={theme} onThemeChange={setTheme} compact />
         </div>
       </header>
 
@@ -201,11 +208,15 @@ export default function Editor({ cloudId }: Props) {
         onZoomIn={() => setZoom((z) => Math.min(1.5, +(z + 0.15).toFixed(2)))}
         onZoomOut={() => setZoom((z) => Math.max(0.25, +(z - 0.15).toFixed(2)))}
         onZoomReset={() => setZoom(1.0)}
-        darkMode={darkMode}
-        onDarkToggle={() => setDarkMode((d) => !d)}
+        theme={theme}
+        onThemeChange={setTheme}
         onHelpToggle={() => setShowHelp((v) => !v)}
         onSaveCloud={handleSaveCloud}
         onShare={handleShare}
+        onUndo={() => dispatch({ type: 'UNDO' })}
+        onRedo={() => dispatch({ type: 'REDO' })}
+        canUndo={canUndo}
+        canRedo={canRedo}
         isLoggedIn={!!user}
       />
 

@@ -16,10 +16,14 @@ type Action =
   | { type: 'UPDATE_HEADING'; rowIndex: number; label: string }
   | { type: 'MOVE_ROW'; rowIndex: number; direction: 'up' | 'down' }
   | { type: 'SET_SANGATHI'; rowIndex: number; sangathiNumber: number | undefined }
+  | { type: 'DUPLICATE_AS_SANGATHI'; rowIndex: number }
+  | { type: 'FILL_ROW_GAPS'; rowIndex: number; field: 'swara' | 'sahitya'; value: string }
   | { type: 'LOAD_COMPOSITION'; state: CompositionState }
   | { type: 'SET_CLOUD_ID'; cloudId: string }
   | { type: 'SET_PUBLIC'; isPublic: boolean; shareId?: string }
   | { type: 'NEW_COMPOSITION' }
+  | { type: 'UNDO' }
+  | { type: 'REDO' }
 
 export const DEFAULT_META: CompositionMeta = {
   name: '',
@@ -131,6 +135,37 @@ function reducer(state: CompositionState, action: Action): CompositionState {
       return { ...state, rows }
     }
 
+    case 'DUPLICATE_AS_SANGATHI': {
+      const src = state.rows[action.rowIndex]
+      if (!src || src.type !== 'notation') return state
+      const baseNum = src.sangathiNumber ?? 1
+      const copy: CompositionRow = {
+        type: 'notation',
+        cells: src.cells.map((c) => ({ ...c })),
+        sangathiNumber: baseNum + 1,
+      }
+      // If the source wasn't yet marked as a sangathi, label it the first variation.
+      const rows = state.rows.map((row, i) =>
+        i === action.rowIndex && row.type === 'notation' && row.sangathiNumber === undefined
+          ? { ...row, sangathiNumber: 1 }
+          : row
+      )
+      rows.splice(action.rowIndex + 1, 0, copy)
+      return { ...state, rows }
+    }
+
+    case 'FILL_ROW_GAPS': {
+      const rows = state.rows.map((row, i) => {
+        if (i !== action.rowIndex || row.type !== 'notation') return row
+        const cells = row.cells.map((cell) => {
+          if ((cell[action.field] || '').trim() !== '') return cell
+          return { ...cell, [action.field]: action.value }
+        })
+        return { ...row, cells }
+      })
+      return { ...state, rows }
+    }
+
     case 'LOAD_COMPOSITION': {
       const cellCount = getCellCountFromMeta(action.state.meta)
       return { ...action.state, rows: ensureCells(action.state.rows, cellCount) }
@@ -153,11 +188,94 @@ function reducer(state: CompositionState, action: Action): CompositionState {
   }
 }
 
+/* ──────────────────────────────────────────────
+   Undo / redo history wrapper
+────────────────────────────────────────────── */
+
+const MAX_HISTORY = 100
+
+type HistoryState = {
+  past: CompositionState[]
+  present: CompositionState
+  future: CompositionState[]
+  lastTag: string | null
+}
+
+// Actions that update the present without creating an undo checkpoint.
+const NON_CHECKPOINT = new Set<Action['type']>(['SET_CLOUD_ID', 'SET_PUBLIC'])
+// Actions that replace the document entirely and clear history.
+const RESET_HISTORY = new Set<Action['type']>(['LOAD_COMPOSITION', 'NEW_COMPOSITION'])
+
+// Continuous edits (typing in a cell/heading/field) coalesce into a single
+// undo step while the target stays the same.
+function coalesceTag(action: Action): string | null {
+  switch (action.type) {
+    case 'UPDATE_CELL':
+      return `cell:${action.rowIndex}:${action.cellIndex}:${action.field}`
+    case 'UPDATE_HEADING':
+      return `heading:${action.rowIndex}`
+    case 'UPDATE_META':
+      return `meta:${Object.keys(action.payload).join(',')}`
+    default:
+      return null
+  }
+}
+
+function historyReducer(h: HistoryState, action: Action): HistoryState {
+  if (action.type === 'UNDO') {
+    if (h.past.length === 0) return h
+    const previous = h.past[h.past.length - 1]
+    return {
+      past: h.past.slice(0, -1),
+      present: previous,
+      future: [h.present, ...h.future],
+      lastTag: null,
+    }
+  }
+
+  if (action.type === 'REDO') {
+    if (h.future.length === 0) return h
+    const next = h.future[0]
+    return {
+      past: [...h.past, h.present],
+      present: next,
+      future: h.future.slice(1),
+      lastTag: null,
+    }
+  }
+
+  const present = reducer(h.present, action)
+  if (present === h.present) return h // no-op, don't touch history
+
+  if (RESET_HISTORY.has(action.type)) {
+    return { past: [], present, future: [], lastTag: null }
+  }
+
+  if (NON_CHECKPOINT.has(action.type)) {
+    return { ...h, present }
+  }
+
+  const tag = coalesceTag(action)
+  if (tag !== null && tag === h.lastTag) {
+    // Continuation of the same edit — replace present, keep the prior checkpoint.
+    return { ...h, present, future: [] }
+  }
+
+  return {
+    past: [...h.past, h.present].slice(-MAX_HISTORY),
+    present,
+    future: [],
+    lastTag: tag,
+  }
+}
+
 type CompositionContextValue = {
   state: CompositionState
   dispatch: React.Dispatch<Action>
   saveIndicator: string
   setSaveIndicator: (msg: string) => void
+  canUndo: boolean
+  canRedo: boolean
 }
 
 const CompositionContext = createContext<CompositionContextValue | null>(null)
@@ -169,9 +287,13 @@ export function CompositionProvider({
   children: React.ReactNode
   initialData?: CompositionState
 }) {
-  const [state, dispatch] = useReducer(reducer, undefined, () =>
-    initialData ?? initialState()
-  )
+  const [history, dispatch] = useReducer(historyReducer, undefined, () => ({
+    past: [],
+    present: initialData ?? initialState(),
+    future: [],
+    lastTag: null,
+  }))
+  const state = history.present
   const [saveIndicator, setSaveIndicator] = React.useState('Not yet saved')
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isInitialized = useRef(false)
@@ -198,7 +320,16 @@ export function CompositionProvider({
   }, [state, initialData])
 
   return (
-    <CompositionContext.Provider value={{ state, dispatch, saveIndicator, setSaveIndicator }}>
+    <CompositionContext.Provider
+      value={{
+        state,
+        dispatch,
+        saveIndicator,
+        setSaveIndicator,
+        canUndo: history.past.length > 0,
+        canRedo: history.future.length > 0,
+      }}
+    >
       {children}
     </CompositionContext.Provider>
   )

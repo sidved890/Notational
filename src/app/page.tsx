@@ -10,6 +10,8 @@ import { getFirebaseAuth, getFirebaseDb } from '@/lib/firebase'
 import { CloudComposition } from '@/lib/types'
 import { getTalaName, TalaBase, Jathi } from '@/lib/tala'
 import AuthModal from '@/components/AuthModal'
+import ThemePicker from '@/components/ThemePicker'
+import { useTheme } from '@/hooks/useTheme'
 
 const FOLDERS_KEY = 'notational_folders'
 // activeFolder sentinels: null = All, '' = Unfiled, any other string = that folder
@@ -29,23 +31,17 @@ export default function Dashboard() {
   const [compositions, setCompositions] = useState<CloudComposition[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState('')
-  const [darkMode, setDarkMode] = useState(false)
+  const { theme, setTheme } = useTheme()
   const [customFolders, setCustomFolders] = useState<string[]>([])
   const [activeFolder, setActiveFolder] = useState<ActiveFolder>(null)
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
 
   useEffect(() => {
-    setDarkMode(localStorage.getItem('notational_dark') === 'true')
     try {
       const raw = localStorage.getItem(FOLDERS_KEY)
       if (raw) setCustomFolders(JSON.parse(raw))
     } catch { /* ignore */ }
   }, [])
-
-  useEffect(() => {
-    document.body.classList.toggle('dark', darkMode)
-    localStorage.setItem('notational_dark', String(darkMode))
-  }, [darkMode])
 
   useEffect(() => {
     const auth = getFirebaseAuth()
@@ -174,9 +170,7 @@ export default function Dashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
           <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
-          <button className="btn btn-icon btn-secondary" onClick={() => setDarkMode(d => !d)} title="Toggle dark mode">
-            {darkMode ? '☀' : '☽'}
-          </button>
+          <ThemePicker theme={theme} onThemeChange={setTheme} compact />
           {authLoaded && (
             user ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

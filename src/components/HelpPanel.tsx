@@ -95,6 +95,17 @@ export default function HelpPanel({ isOpen, onClose }: Props) {
           <HelpRow shortcut="p '" desc="ṗ (pa)" />
         </HelpSection>
 
+        <HelpSection title="Avartanam actions (hover a row)">
+          <HelpRow shortcut="ɔ" desc="Fill empty swara cells with karvai (ɔ)" />
+          <HelpRow shortcut="—" desc="Fill empty sahitya cells with dashes" />
+          <HelpRow shortcut="+S" desc="Duplicate this avartanam as a new sangathi" />
+        </HelpSection>
+
+        <HelpSection title="Editing">
+          <HelpRow shortcut="Ctrl/Cmd Z" desc="Undo" />
+          <HelpRow shortcut="Ctrl/Cmd Shift Z" desc="Redo" />
+        </HelpSection>
+
         <HelpSection title="Navigation">
           <HelpRow shortcut="← →" desc="Move between cells" />
           <HelpRow shortcut="↑ ↓" desc="Move down the column into the next/previous avartanam" />

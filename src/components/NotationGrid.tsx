@@ -1,8 +1,10 @@
 'use client'
 
-import { useRef, useCallback, useState } from 'react'
+import { useRef, useCallback, useState, useEffect, useLayoutEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useComposition } from '@/context/CompositionContext'
 import { getTalaPattern, getCellCount, TalaBase, Jathi } from '@/lib/tala'
+import { KARVAI_CHAR, SAHITYA_GAP_CHAR } from '@/lib/notation-constants'
 import NotationCell from './NotationCell'
 import SectionHeading from './SectionHeading'
 
@@ -184,9 +186,27 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                 ))}
 
                 {/* Row actions */}
-                <div className="row-actions" style={{ display: 'none', alignItems: 'center', gap: 2, padding: '0 4px', flexShrink: 0 }}>
+                <div className="row-actions no-print" style={{ display: 'none', alignItems: 'center', gap: 2, padding: '0 4px', flexShrink: 0 }}>
+                  <RowActionBtn
+                    title={`Fill empty swara cells with karvai (${KARVAI_CHAR})`}
+                    onClick={() => dispatch({ type: 'FILL_ROW_GAPS', rowIndex, field: 'swara', value: KARVAI_CHAR })}
+                  >
+                    {KARVAI_CHAR}
+                  </RowActionBtn>
+                  <RowActionBtn
+                    title="Fill empty sahitya cells with dashes"
+                    onClick={() => dispatch({ type: 'FILL_ROW_GAPS', rowIndex, field: 'sahitya', value: SAHITYA_GAP_CHAR })}
+                  >
+                    —
+                  </RowActionBtn>
                   <button onClick={() => dispatch({ type: 'MOVE_ROW', rowIndex, direction: 'up' })} disabled={rowIndex === 0} title="Move up" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▲</button>
                   <button onClick={() => dispatch({ type: 'MOVE_ROW', rowIndex, direction: 'down' })} disabled={rowIndex === rows.length - 1} title="Move down" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▼</button>
+                  <RowActionBtn
+                    title="Duplicate this avartanam as a new sangathi"
+                    onClick={() => dispatch({ type: 'DUPLICATE_AS_SANGATHI', rowIndex })}
+                  >
+                    +S
+                  </RowActionBtn>
                   <SangathiPicker rowIndex={rowIndex} current={sangathiNum} />
                   <button onClick={() => { if (rows.filter(r => r.type === 'notation').length > 1 && confirm('Delete this avartanam?')) dispatch({ type: 'DELETE_ROW', rowIndex }) }} title="Delete" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 14, padding: '2px', lineHeight: 1 }}>×</button>
                 </div>
@@ -241,39 +261,96 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
   )
 }
 
+function RowActionBtn({ children, title, onClick }: { children: React.ReactNode; title: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      style={{
+        background: 'rgba(201,151,58,0.12)',
+        border: '1px solid rgba(201,151,58,0.35)',
+        borderRadius: 4,
+        color: 'var(--burgundy)',
+        cursor: 'pointer',
+        fontSize: 11,
+        fontWeight: 700,
+        padding: '1px 5px',
+        lineHeight: 1.4,
+        fontFamily: 'var(--font-serif)',
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
 function SangathiPicker({ rowIndex, current }: { rowIndex: number; current?: number }) {
   const { dispatch } = useComposition()
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const [coords, setCoords] = useState<{ left: number; top: number }>({ left: 0, top: 0 })
+
+  useEffect(() => setMounted(true), [])
+
+  // Position the portal menu relative to the button, in viewport coordinates so
+  // it isn't clipped by the grid wrapper's `overflow: hidden`.
+  useLayoutEffect(() => {
+    if (!open) return
+    function place() {
+      const btn = btnRef.current
+      if (!btn) return
+      const r = btn.getBoundingClientRect()
+      const menuHeight = 200
+      const openUp = r.bottom + menuHeight > window.innerHeight
+      setCoords({
+        left: Math.min(r.left, window.innerWidth - 140),
+        top: openUp ? Math.max(8, r.top - menuHeight) : r.bottom + 4,
+      })
+    }
+    place()
+    window.addEventListener('scroll', place, true)
+    window.addEventListener('resize', place)
+    return () => {
+      window.removeEventListener('scroll', place, true)
+      window.removeEventListener('resize', place)
+    }
+  }, [open])
 
   return (
-    <div style={{ position: 'relative' }}>
-      <button onClick={() => setOpen(v => !v)} title="Set Sangathi number" style={{
+    <>
+      <button ref={btnRef} onClick={() => setOpen(v => !v)} title="Set Sangathi number" style={{
         background: current ? 'rgba(201,151,58,0.2)' : 'none', border: current ? '1px solid var(--gold)' : 'none',
         color: current ? 'var(--gold)' : 'var(--ink-faint)', cursor: 'pointer',
         fontSize: 10, padding: '1px 4px', borderRadius: 3, lineHeight: 1.4, fontWeight: 700,
       }}>
         {current ? `S${current}` : 'S#'}
       </button>
-      {open && (
-        <div style={{
-          position: 'absolute', top: '100%', left: 0, zIndex: 50,
-          background: 'var(--parchment)', border: '1.5px solid var(--gold)',
-          borderRadius: 6, padding: 6, boxShadow: '0 4px 12px var(--shadow)',
-          display: 'flex', flexDirection: 'column', gap: 2, minWidth: 80,
-        }}>
-          <div style={{ fontSize: 9, color: 'var(--gold)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>Sangathi</div>
-          {[undefined, 1, 2, 3, 4, 5].map((n) => (
-            <button key={n ?? 'none'} onClick={() => { dispatch({ type: 'SET_SANGATHI', rowIndex, sangathiNumber: n }); setOpen(false) }} style={{
-              padding: '3px 8px', borderRadius: 4, border: 'none', cursor: 'pointer',
-              background: current === n ? 'var(--burgundy)' : 'transparent',
-              color: current === n ? 'var(--parchment)' : 'var(--ink)', fontSize: 12,
-              fontWeight: 600, textAlign: 'left', fontFamily: 'var(--font-ui)',
-            }}>
-              {n === undefined ? 'None' : `Sangathi ${n}`}
-            </button>
-          ))}
-        </div>
+      {open && mounted && createPortal(
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 1000 }} onClick={() => setOpen(false)} />
+          <div style={{
+            position: 'fixed', left: coords.left, top: coords.top, zIndex: 1001,
+            background: 'var(--parchment)', border: '1.5px solid var(--gold)',
+            borderRadius: 6, padding: 6, boxShadow: '0 4px 12px var(--shadow)',
+            display: 'flex', flexDirection: 'column', gap: 2, minWidth: 110,
+          }}>
+            <div style={{ fontSize: 9, color: 'var(--gold)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 2 }}>Sangathi</div>
+            {[undefined, 1, 2, 3, 4, 5].map((n) => (
+              <button key={n ?? 'none'} onClick={() => { dispatch({ type: 'SET_SANGATHI', rowIndex, sangathiNumber: n }); setOpen(false) }} style={{
+                padding: '3px 8px', borderRadius: 4, border: 'none', cursor: 'pointer',
+                background: current === n ? 'var(--burgundy)' : 'transparent',
+                color: current === n ? 'var(--parchment)' : 'var(--ink)', fontSize: 12,
+                fontWeight: 600, textAlign: 'left', fontFamily: 'var(--font-ui)',
+              }}>
+                {n === undefined ? 'None' : `Sangathi ${n}`}
+              </button>
+            ))}
+          </div>
+        </>,
+        document.body
       )}
-    </div>
+    </>
   )
 }

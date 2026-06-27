@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import ThemePicker from '@/components/ThemePicker'
+import { useTheme } from '@/hooks/useTheme'
 
 export default function TutorialPage() {
-  const [darkMode, setDarkMode] = useState(false)
-  useEffect(() => { setDarkMode(localStorage.getItem('notational_dark') === 'true') }, [])
-  useEffect(() => { document.body.classList.toggle('dark', darkMode) }, [darkMode])
+  const { theme, setTheme } = useTheme()
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--parchment)' }}>
@@ -21,10 +20,7 @@ export default function TutorialPage() {
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
           <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
-          <button
-            onClick={() => { const d = !darkMode; setDarkMode(d); localStorage.setItem('notational_dark', String(d)) }}
-            style={{ background: 'none', border: '1.5px solid rgba(107,30,46,0.25)', borderRadius: 4, color: 'var(--burgundy)', cursor: 'pointer', padding: '6px 10px', fontSize: 15 }}
-          >{darkMode ? '☀' : '☽'}</button>
+          <ThemePicker theme={theme} onThemeChange={setTheme} compact />
         </div>
       </header>
 
@@ -102,6 +98,10 @@ export default function TutorialPage() {
             use the <Pill>S#</Pill> control to tag it as a <strong>sangathi</strong> variation, and the ▲ ▼
             buttons to reorder rows.
           </p>
+          <p>
+            Each avartanam also has quick-fill buttons on hover: <Pill>ɔ</Pill> fills every empty swara cell
+            with a karvai, and <Pill>—</Pill> fills empty lyric cells with dashes.
+          </p>
         </Step>
 
         <Step n={7} title="Save, organize, and share">
@@ -117,6 +117,13 @@ export default function TutorialPage() {
           <p>
             <Pill>⎙ Print</Pill> produces a printer-friendly page: the song name, ragam, talam, composer,
             and raga overview appear at the top, followed by the notation grid — editing controls are hidden.
+          </p>
+        </Step>
+
+        <Step n={9} title="Choose a theme">
+          <p>
+            Click the colored circle in the header or toolbar to pick a theme — Parchment, Midnight, Forest,
+            Ocean, Slate, or Rosewood. Your choice is remembered across sessions.
           </p>
         </Step>
 

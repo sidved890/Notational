@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import ThemePicker from '@/components/ThemePicker'
+import { useTheme } from '@/hooks/useTheme'
 
 export default function AboutPage() {
-  const [darkMode, setDarkMode] = useState(false)
-  useEffect(() => { setDarkMode(localStorage.getItem('notational_dark') === 'true') }, [])
-  useEffect(() => { document.body.classList.toggle('dark', darkMode) }, [darkMode])
+  const { theme, setTheme } = useTheme()
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--parchment)' }}>
@@ -21,10 +20,7 @@ export default function AboutPage() {
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
-          <button
-            onClick={() => { const d = !darkMode; setDarkMode(d); localStorage.setItem('notational_dark', String(d)) }}
-            style={{ background: 'none', border: '1.5px solid rgba(107,30,46,0.25)', borderRadius: 4, color: 'var(--burgundy)', cursor: 'pointer', padding: '6px 10px', fontSize: 15 }}
-          >{darkMode ? '☀' : '☽'}</button>
+          <ThemePicker theme={theme} onThemeChange={setTheme} compact />
         </div>
       </header>
 
@@ -77,8 +73,8 @@ export default function AboutPage() {
                 Budding Vocalist · Mridangist · Developer
               </div>
               <p style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--ink)', lineHeight: 1.75, marginBottom: 14 }}>
-                A senior at Dougherty Valley High School with a deep passion for Carnatic music —
-                as both a vocalist and a mridangist — and an equal enthusiasm for web development
+                Sid is a senior at Dougherty Valley High School with a deep passion for Carnatic music —
+                as both a vocalist and a mridangist — and an enthusiasm for web development
                 and data science.
               </p>
               <p style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--ink)', lineHeight: 1.75 }}>
@@ -99,6 +95,8 @@ export default function AboutPage() {
             { icon: '↗', label: 'Share', desc: 'Generate a public link for any composition' },
             { icon: '⎙', label: 'Print Ready', desc: 'Clean print output with raga info header' },
             { icon: 'S#', label: 'Sangathi', desc: 'Mark multiple variations of the same avartanam' },
+            { icon: 'ɔ', label: 'Gap Fill', desc: 'Fill empty swara or sahitya cells per avartanam' },
+            { icon: '◐', label: 'Themes', desc: 'Six color themes — Parchment, Midnight, Forest, and more' },
           ].map((f) => (
             <div key={f.label} style={{ padding: '14px 16px', background: 'var(--parchment-dark)', borderRadius: 8, border: '1px solid rgba(201,151,58,0.2)' }}>
               <div style={{ fontSize: 18, color: 'var(--gold)', marginBottom: 6, fontFamily: 'var(--font-serif)' }}>{f.icon}</div>

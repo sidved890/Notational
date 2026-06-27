@@ -39,11 +39,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${notoSerif.variable} ${crimsonPro.variable} ${imFellEnglish.variable}`}
+        className={`${notoSerif.variable} ${crimsonPro.variable} ${imFellEnglish.variable} theme-parchment`}
         style={{
           fontFamily: 'var(--font-crimson-pro, "Crimson Pro", Georgia, serif)',
         }}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var ids=['parchment','midnight','forest','ocean','slate','rosewood'];var t=localStorage.getItem('notational_theme');if(!t&&localStorage.getItem('notational_dark')==='true')t='midnight';if(!t||ids.indexOf(t)<0)t='parchment';ids.forEach(function(id){document.body.classList.remove('theme-'+id)});document.body.classList.add('theme-'+t);document.body.dataset.theme=t;}catch(e){}})();`,
+          }}
+        />
         {children}
       </body>
     </html>

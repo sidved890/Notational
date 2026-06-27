@@ -3,17 +3,23 @@
 import { useRef } from 'react'
 import { useComposition } from '@/context/CompositionContext'
 import { serializeState, deserializeState } from '@/lib/storage'
+import ThemePicker from './ThemePicker'
+import { ThemeId } from '@/lib/themes'
 
 type Props = {
   zoom: number
   onZoomIn: () => void
   onZoomOut: () => void
   onZoomReset: () => void
-  darkMode: boolean
-  onDarkToggle: () => void
+  theme: ThemeId
+  onThemeChange: (theme: ThemeId) => void
   onHelpToggle: () => void
   onSaveCloud?: () => void
   onShare?: () => void
+  onUndo: () => void
+  onRedo: () => void
+  canUndo: boolean
+  canRedo: boolean
   isLoggedIn: boolean
 }
 
@@ -22,11 +28,15 @@ export default function Toolbar({
   onZoomIn,
   onZoomOut,
   onZoomReset,
-  darkMode,
-  onDarkToggle,
+  theme,
+  onThemeChange,
   onHelpToggle,
   onSaveCloud,
   onShare,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
   isLoggedIn,
 }: Props) {
   const { state, dispatch, saveIndicator } = useComposition()
@@ -81,6 +91,24 @@ export default function Toolbar({
       }}
       className="no-print"
     >
+      <button
+        className="btn btn-icon btn-secondary"
+        onClick={onUndo}
+        disabled={!canUndo}
+        title="Undo (Ctrl/Cmd+Z)"
+        style={{ opacity: canUndo ? 1 : 0.4, cursor: canUndo ? 'pointer' : 'not-allowed' }}
+      >
+        ↶
+      </button>
+      <button
+        className="btn btn-icon btn-secondary"
+        onClick={onRedo}
+        disabled={!canRedo}
+        title="Redo (Ctrl/Cmd+Shift+Z)"
+        style={{ opacity: canRedo ? 1 : 0.4, cursor: canRedo ? 'pointer' : 'not-allowed' }}
+      >
+        ↷
+      </button>
       <button className="btn btn-primary" onClick={handleSaveJSON}>
         ⬇ Save JSON
       </button>
@@ -141,10 +169,8 @@ export default function Toolbar({
         </ZoomBtn>
       </div>
 
-      {/* Dark mode */}
-      <button className="btn btn-icon btn-secondary" onClick={onDarkToggle} title="Toggle dark mode">
-        {darkMode ? '☀' : '☽'}
-      </button>
+      {/* Theme */}
+      <ThemePicker theme={theme} onThemeChange={onThemeChange} compact />
 
       {/* Help */}
       <button
