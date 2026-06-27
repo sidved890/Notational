@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+/* ════════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════ */
+:root {
+  --parchment: #F5EFE0;
+  --parchment-dark: #EDE4CC;
+  --parchment-darker: #E3D8B8;
+  --burgundy: #6B1E2E;
+  --burgundy-light: #8B2E42;
+  --gold: #C9973A;
+  --gold-light: #DEB96A;
+  --gold-faint: rgba(201,151,58,0.12);
+  --ink: #2A1A0E;
+  --ink-light: #5A3A28;
+  --ink-faint: rgba(42,26,14,0.4);
+  --anga-divider: rgba(107,30,46,0.55);
+  --beat-divider: rgba(201,151,58,0.35);
+  --cell-border: rgba(107,30,46,0.15);
+  --shadow: rgba(42,26,14,0.15);
+  --font-serif: var(--font-noto-serif, 'Noto Serif', Georgia, serif);
+  --font-display: var(--font-im-fell-english, 'IM Fell English', Georgia, serif);
+  --font-ui: var(--font-crimson-pro, 'Crimson Pro', Georgia, serif);
+}
+
+/* ── DARK MODE ── */
+.dark {
+  --parchment: #1A1208;
+  --parchment-dark: #221A0E;
+  --ink: #E8DCC8;
+  --ink-light: #C8B898;
+  --ink-faint: rgba(232,220,200,0.4);
+  --cell-border: rgba(201,151,58,0.25);
+  --shadow: rgba(0,0,0,0.4);
+  --anga-divider: rgba(201,151,58,0.7);
+  --beat-divider: rgba(201,151,58,0.25);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1.5px solid;
+  letter-spacing: 0.03em;
+}
+
+.btn-primary {
+  background: var(--burgundy);
+  border-color: var(--burgundy);
+  color: var(--parchment);
+}
+.btn-primary:hover { background: var(--burgundy-light); }
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--burgundy);
+  color: var(--burgundy);
+}
+.btn-secondary:hover { background: rgba(107,30,46,0.08); }
+
+.btn-gold {
+  background: transparent;
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.btn-gold:hover { background: var(--gold-faint); }
+
+.btn-icon { padding: 7px 10px; font-size: 15px; line-height: 1; }
+
+/* ── NOTATION CELL ── */
+.cell-swara, .cell-sahitya {
+  border: none;
+  background: transparent;
+  font-family: var(--font-serif);
+  color: var(--ink);
+  text-align: center;
+  width: 100%;
+  padding: 3px 2px;
+  outline: none;
+  min-width: 0;
+  caret-color: var(--burgundy);
+}
+
+.cell-swara {
+  font-size: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(107,30,46,0.08);
+  height: 32px;
+}
+
+.cell-sahitya {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--ink-light);
+  opacity: 0.7;
+  height: 22px;
+}
+
+.notation-cell:focus-within {
+  background: rgba(201,151,58,0.13);
+  box-shadow: inset 0 0 0 1.5px var(--gold);
+  z-index: 1;
+}
+
+.cell-swara:focus,
+.cell-sahitya:focus {
+  background: rgba(201,151,58,0.06);
+}
+
+/* Beat group alternating */
+.beat-group-alt { background: rgba(107,30,46,0.025); }
+.dark .beat-group-alt { background: rgba(201,151,58,0.06); }
+
+/* Playback highlight */
+.playback-hl {
+  outline: 2.5px solid var(--gold) !important;
+  outline-offset: -1px;
+  background: rgba(201,151,58,0.2) !important;
+}
+
+/* ── FIELD INPUT ── */
+.field-input {
+  padding: 7px 11px;
+  background: var(--parchment);
+  border: 1.5px solid rgba(107,30,46,0.25);
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201,151,58,0.2);
+}
+
+/* ── HEADING INPUT ── */
+.heading-label-input {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--burgundy);
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  outline: none;
+  min-width: 140px;
+  width: auto;
+  max-width: 300px;
+  caret-color: var(--burgundy);
+}
+.heading-label-input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+/* ── BEAT SYMBOLS ── */
+.beat-sym-X { color: var(--burgundy); font-weight: 800; }
+.beat-sym-V { color: var(--gold); font-style: italic; }
+.beat-sym-num { color: var(--ink-light); opacity: 0.7; }
+
+/* ── AUTH AVATAR ── */
+.auth-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  object-fit: cover;
+}
+
+/* ── KBD ── */
+kbd {
+  display: inline-block;
+  background: var(--parchment-dark);
+  border: 1.5px solid rgba(107,30,46,0.3);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--burgundy);
+  box-shadow: 0 1px 0 rgba(107,30,46,0.2);
+}
+
+/* ── PRINT ── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; color: black; }
+  .cell-swara { font-size: 12px; }
+  .cell-sahitya { font-size: 10px; }
+  .grid-zoom-inner { transform: none !important; }
+}
