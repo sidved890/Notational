@@ -724,7 +724,8 @@ function laghuPattern(jathi) {
 // Returns { name, pattern, angaSizes, beats }
 function buildTalaConfig(talaBase, jathi) {
   if (SPECIAL_TALAS[talaBase]) {
-    return { name: SPECIAL_TALAS[talaBase].name, ...SPECIAL_TALAS[talaBase] };
+    const s = SPECIAL_TALAS[talaBase];
+    return { name: s.name, pattern: s.pattern, angaSizes: s.angaSizes, beats: s.pattern.length };
   }
   const base = BASE_TALAS[talaBase];
   const L = laghuPattern(jathi);
