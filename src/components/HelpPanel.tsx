@@ -95,10 +95,10 @@ export default function HelpPanel({ isOpen, onClose }: Props) {
           <HelpRow shortcut="p '" desc="ṗ (pa)" />
         </HelpSection>
 
-        <HelpSection title="Avartanam actions (hover a row)">
+        <HelpSection title="Avarthanam actions (hover a row)">
           <HelpRow shortcut="ɔ" desc="Fill empty swara cells with karvai (ɔ)" />
           <HelpRow shortcut="—" desc="Fill empty sahitya cells with dashes" />
-          <HelpRow shortcut="+S" desc="Duplicate this avartanam as a new sangathi" />
+          <HelpRow shortcut="+S" desc="Duplicate this avarthanam as a new sangathi" />
         </HelpSection>
 
         <HelpSection title="Editing">
@@ -108,7 +108,7 @@ export default function HelpPanel({ isOpen, onClose }: Props) {
 
         <HelpSection title="Navigation">
           <HelpRow shortcut="← →" desc="Move between cells" />
-          <HelpRow shortcut="↑ ↓" desc="Move down the column into the next/previous avartanam" />
+          <HelpRow shortcut="↑ ↓" desc="Move down the column into the next/previous avarthanam" />
           <HelpRow shortcut="Tab / Shift+Tab" desc="Forward / backward" />
           <HelpRow shortcut="Enter in swara" desc="Jump to sahitya" />
           <HelpRow shortcut="Enter in sahitya" desc="Jump to next cell's swara" />

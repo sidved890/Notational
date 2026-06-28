@@ -42,6 +42,6 @@ function getTalaDisplay(meta: { talaBase?: string; jathi?: string; kalai?: numbe
   }
   const talaPart = ['misra_chapu', 'khanda_chapu', 'rupaka_traditional'].includes(talaBase)
     ? (names[talaBase] || talaBase)
-    : `${jathiNames[jathi] || jathi} Jati ${names[talaBase] || talaBase}`
-  return kalai === 2 ? `${talaPart} (Kalai 2)` : talaPart
+    : `${jathiNames[jathi] || jathi} Jathi ${names[talaBase] || talaBase}`
+  return kalai === 2 ? `${talaPart} (2 Kalai)` : talaPart
 }

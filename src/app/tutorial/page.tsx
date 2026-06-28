@@ -14,8 +14,13 @@ export default function TutorialPage() {
         background: 'linear-gradient(to bottom, var(--parchment-dark), var(--parchment))',
       }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--burgundy)', fontStyle: 'italic' }}>Notational</div>
-          <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>Carnatic Music Notation System</div>
+          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontFamily: 'var(--font-devanagari)', fontSize: 34, color: 'var(--burgundy)', lineHeight: 1 }}>न</span>
+            <div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--burgundy)', fontStyle: 'italic' }}>Notational</div>
+              <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>Carnatic Music Notation System</div>
+            </div>
+          </a>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
@@ -59,10 +64,10 @@ export default function TutorialPage() {
         <Step n={3} title="Choose the talam">
           <p>
             Pick a <strong>talam</strong> from the presets (Adi, Rupaka, Misra Chapu…) or build any of
-            the 35 talas by choosing a base tala and a jathi. Then set:
+            the 35 talams by choosing a base talam and a jathi. Then set:
           </p>
           <ul style={ulStyle}>
-            <li><strong>Kalai</strong> — 1× (normal) or 2× (double) speed; 2× doubles every beat slot.</li>
+            <li><strong>Kalai</strong> — 1 Kalai (normal) or 2 Kalai (double) speed; 2 Kalai doubles every beat slot.</li>
             <li><strong>Gathi</strong> — the number of maatras (sub-beats) packed into each beat.</li>
           </ul>
           <p>The grid automatically lays out the correct beat markers (X, V, finger counts) for the talam you chose.</p>
@@ -74,7 +79,7 @@ export default function TutorialPage() {
             {' '}(lyric) below. Type a swara, then move on — the grid is built for fast keyboard entry:
           </p>
           <ul style={ulStyle}>
-            <li><Kbd>← →</Kbd> move between cells, <Kbd>↑ ↓</Kbd> move down the column into the next or previous avartanam.</li>
+            <li><Kbd>← →</Kbd> move between cells, <Kbd>↑ ↓</Kbd> move down the column into the next or previous avarthanam.</li>
             <li><Kbd>Enter</Kbd> in a swara jumps to its lyric; <Kbd>Enter</Kbd> in a lyric jumps to the next cell.</li>
             <li><Kbd>Tab</Kbd> / <Kbd>Shift+Tab</Kbd> move forward and backward.</li>
             <li><Kbd>Delete</Kbd> clears the current swara cell and moves one cell to the left — handy for fixing a run of notes.</li>
@@ -94,12 +99,12 @@ export default function TutorialPage() {
         <Step n={6} title="Structure with sections and sangathis">
           <p>
             Use <Pill>§ Add Section Heading</Pill> (or the insert strip that appears between rows) to label
-            sections like <em>Pallavi</em>, <em>Anupallavi</em>, and <em>Charanam</em>. Hover an avartanam and
+            sections like <em>Pallavi</em>, <em>Anupallavi</em>, and <em>Charanam</em>. Hover an avarthanam and
             use the <Pill>S#</Pill> control to tag it as a <strong>sangathi</strong> variation, and the ▲ ▼
             buttons to reorder rows.
           </p>
           <p>
-            Each avartanam also has quick-fill buttons on hover: <Pill>ɔ</Pill> fills every empty swara cell
+            Each avarthanam also has quick-fill buttons on hover: <Pill>ɔ</Pill> fills every empty swara cell
             with a karvai, and <Pill>—</Pill> fills empty lyric cells with dashes.
           </p>
         </Step>

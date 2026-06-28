@@ -243,7 +243,7 @@ export default function CompositionsPanel({ isOpen, onClose, user, onNew }: Prop
                     >
                       {comp.ragam ? `${comp.ragam} · ` : ''}
                       {comp.talaBase || comp.ragam || ''}
-                      {comp.avartanamCount ? ` · ${comp.avartanamCount} avartanams` : ''}
+                      {comp.avartanamCount ? ` · ${comp.avartanamCount} avartahanams` : ''}
                     </div>
                   </div>
                   <button

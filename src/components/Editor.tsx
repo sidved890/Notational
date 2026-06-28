@@ -19,11 +19,12 @@ import PlaybackBar from './PlaybackBar'
 import HelpPanel from './HelpPanel'
 import AuthModal from './AuthModal'
 import ThemePicker from './ThemePicker'
+import TutorialOverlay from './TutorialOverlay'
 import { useTheme } from '@/hooks/useTheme'
 
-type Props = { cloudId: string | null }
+type Props = { cloudId: string | null; isTutorial?: boolean }
 
-export default function Editor({ cloudId }: Props) {
+export default function Editor({ cloudId, isTutorial }: Props) {
   const { state, dispatch, setSaveIndicator, canUndo, canRedo } = useComposition()
   const router = useRouter()
 
@@ -160,14 +161,18 @@ export default function Editor({ cloudId }: Props) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)' }}>← Dashboard</a>
+          <a href="/library" style={{ color: 'var(--ink-faint)', fontSize: 12, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Library</a>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 12, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
           <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 12, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
-          <div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--burgundy)', fontStyle: 'italic' }}>Notational</div>
-            <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>
-              Carnatic Music Notation
+          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontFamily: 'var(--font-devanagari)', fontSize: 28, color: 'var(--burgundy)', lineHeight: 1 }}>न</span>
+            <div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--burgundy)', fontStyle: 'italic' }}>Notational</div>
+              <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>
+                Carnatic Music Notation
+              </div>
             </div>
-          </div>
+          </a>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           {authLoaded && (user ? (
@@ -198,40 +203,44 @@ export default function Editor({ cloudId }: Props) {
         </div>
       )}
 
-      <MetadataPanel />
+      <div data-tutorial="metadata">
+        <MetadataPanel />
+      </div>
 
       {/* Print-only header: song name, ragam, talam, composer, raga info */}
       <PrintHeader />
 
-      <Toolbar
-        zoom={zoom}
-        onZoomIn={() => setZoom((z) => Math.min(1.5, +(z + 0.15).toFixed(2)))}
-        onZoomOut={() => setZoom((z) => Math.max(0.25, +(z - 0.15).toFixed(2)))}
-        onZoomReset={() => setZoom(1.0)}
-        theme={theme}
-        onThemeChange={setTheme}
-        onHelpToggle={() => setShowHelp((v) => !v)}
-        onSaveCloud={handleSaveCloud}
-        onShare={handleShare}
-        onUndo={() => dispatch({ type: 'UNDO' })}
-        onRedo={() => dispatch({ type: 'REDO' })}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        isLoggedIn={!!user}
-      />
+      <div data-tutorial="toolbar">
+        <Toolbar
+          zoom={zoom}
+          onZoomIn={() => setZoom((z) => Math.min(1.5, +(z + 0.15).toFixed(2)))}
+          onZoomOut={() => setZoom((z) => Math.max(0.25, +(z - 0.15).toFixed(2)))}
+          onZoomReset={() => setZoom(1.0)}
+          theme={theme}
+          onThemeChange={setTheme}
+          onHelpToggle={() => setShowHelp((v) => !v)}
+          onSaveCloud={handleSaveCloud}
+          onShare={handleShare}
+          onUndo={() => dispatch({ type: 'UNDO' })}
+          onRedo={() => dispatch({ type: 'REDO' })}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          isLoggedIn={!!user}
+        />
+      </div>
 
       <PlaybackBar onPlaybackCell={setPlaybackCell} />
 
       {/* Grid info */}
       <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, color: 'var(--ink)', fontStyle: 'italic' }}>
-          {talaName} · Kalai {state.meta.kalai} · {beatCount} beats · {state.meta.maatras} maatras/beat
+          {talaName} · {state.meta.kalai} Kalai · {beatCount} beats · {state.meta.maatras} maatras/beat
         </div>
         {state.meta.kalai === 2 && (
           <span style={{
             background: 'linear-gradient(135deg, var(--gold), #B8820A)', color: 'white',
             fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase',
-          }}>Kalai 2</span>
+          }}>2 Kalai</span>
         )}
         {state.isPublic && (
           <span style={{ background: 'rgba(90,138,58,0.15)', color: '#5A8A3A', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 10, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -240,10 +249,13 @@ export default function Editor({ cloudId }: Props) {
         )}
       </div>
 
-      <NotationGrid zoom={zoom} playbackCell={playbackCell} />
+      <div data-tutorial="grid">
+        <NotationGrid zoom={zoom} playbackCell={playbackCell} />
+      </div>
 
       <HelpPanel isOpen={showHelp} onClose={() => setShowHelp(false)} />
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
+      {isTutorial && <TutorialOverlay />}
     </div>
   )
 }

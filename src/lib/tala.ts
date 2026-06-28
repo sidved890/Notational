@@ -212,7 +212,7 @@ export function getTalaName(talaBase: TalaBase, jathi: Jathi): string {
   if (IS_SPECIAL_TALA[talaBase]) {
     return TALA_BASE_LABELS[talaBase]
   }
-  return `${JATHI_LABELS[jathi].split(' ')[0]} Jati ${TALA_BASE_LABELS[talaBase]}`
+  return `${JATHI_LABELS[jathi].split(' ')[0]} Jathi ${TALA_BASE_LABELS[talaBase]}`
 }
 
 /**

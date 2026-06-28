@@ -202,13 +202,13 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                   <button onClick={() => dispatch({ type: 'MOVE_ROW', rowIndex, direction: 'up' })} disabled={rowIndex === 0} title="Move up" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▲</button>
                   <button onClick={() => dispatch({ type: 'MOVE_ROW', rowIndex, direction: 'down' })} disabled={rowIndex === rows.length - 1} title="Move down" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▼</button>
                   <RowActionBtn
-                    title="Duplicate this avartanam as a new sangathi"
+                    title="Duplicate this avarthanam as a new sangathi"
                     onClick={() => dispatch({ type: 'DUPLICATE_AS_SANGATHI', rowIndex })}
                   >
                     +S
                   </RowActionBtn>
                   <SangathiPicker rowIndex={rowIndex} current={sangathiNum} />
-                  <button onClick={() => { if (rows.filter(r => r.type === 'notation').length > 1 && confirm('Delete this avartanam?')) dispatch({ type: 'DELETE_ROW', rowIndex }) }} title="Delete" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 14, padding: '2px', lineHeight: 1 }}>×</button>
+                  <button onClick={() => { if (rows.filter(r => r.type === 'notation').length > 1 && confirm('Delete this avarthanam?')) dispatch({ type: 'DELETE_ROW', rowIndex }) }} title="Delete" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 14, padding: '2px', lineHeight: 1 }}>×</button>
                 </div>
               </div>
 

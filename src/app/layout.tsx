@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Noto_Serif, Crimson_Pro, IM_Fell_English } from 'next/font/google'
+import { Noto_Serif, Crimson_Pro, IM_Fell_English, Noto_Serif_Devanagari } from 'next/font/google'
 import './globals.css'
 
 const notoSerif = Noto_Serif({
@@ -26,9 +26,17 @@ const imFellEnglish = IM_Fell_English({
   display: 'swap',
 })
 
+const notoSerifDevanagari = Noto_Serif_Devanagari({
+  variable: '--font-devanagari',
+  subsets: ['devanagari'],
+  weight: ['400', '700'],
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: 'Notational — Carnatic Music Notation',
-  description: 'Professional Carnatic music notation system with full tala support',
+  description: 'Professional Carnatic music notation system with full talam support',
+  icons: { icon: '/logo.svg' },
 }
 
 export default function RootLayout({
@@ -39,7 +47,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${notoSerif.variable} ${crimsonPro.variable} ${imFellEnglish.variable} theme-parchment`}
+        className={`${notoSerif.variable} ${crimsonPro.variable} ${imFellEnglish.variable} ${notoSerifDevanagari.variable} theme-parchment`}
         style={{
           fontFamily: 'var(--font-crimson-pro, "Crimson Pro", Georgia, serif)',
         }}

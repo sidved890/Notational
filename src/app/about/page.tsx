@@ -13,10 +13,13 @@ export default function AboutPage() {
         padding: '16px 32px', borderBottom: '2px solid var(--gold)',
         background: 'linear-gradient(to bottom, var(--parchment-dark), var(--parchment))',
       }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--burgundy)', fontStyle: 'italic' }}>Notational</div>
-          <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>Carnatic Music Notation System</div>
-        </div>
+        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontFamily: 'var(--font-devanagari)', fontSize: 34, color: 'var(--burgundy)', lineHeight: 1 }}>न</span>
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--burgundy)', fontStyle: 'italic' }}>Notational</div>
+            <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>Carnatic Music Notation System</div>
+          </div>
+        </a>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
           <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
@@ -79,7 +82,7 @@ export default function AboutPage() {
               </p>
               <p style={{ fontFamily: 'var(--font-serif)', fontSize: 15, color: 'var(--ink)', lineHeight: 1.75 }}>
                 Notational was built out of a personal need: a notation tool that respects the
-                nuance of the Carnatic system — its tala structures, its octave markers, its
+                nuance of the Carnatic system — its talam structures, its octave markers, its
                 lyric alignment — without the limitations of paper or generic spreadsheets.
               </p>
             </div>
@@ -89,13 +92,13 @@ export default function AboutPage() {
         {/* Feature highlights */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 40 }}>
           {[
-            { icon: '♩', label: '35 Tala System', desc: '7 base talas × 5 jathis, plus Misra/Khanda Chapu' },
+            { icon: '♩', label: '35 Talam System', desc: '7 base talams × 5 jathis, plus Misra/Khanda Chapu' },
             { icon: '◆', label: 'Section Headings', desc: 'Pallavi, Anupallavi, Charanam and custom labels' },
             { icon: '☁', label: 'Cloud Storage', desc: 'Save and access your compositions anywhere' },
             { icon: '↗', label: 'Share', desc: 'Generate a public link for any composition' },
             { icon: '⎙', label: 'Print Ready', desc: 'Clean print output with raga info header' },
-            { icon: 'S#', label: 'Sangathi', desc: 'Mark multiple variations of the same avartanam' },
-            { icon: 'ɔ', label: 'Gap Fill', desc: 'Fill empty swara or sahitya cells per avartanam' },
+            { icon: 'S#', label: 'Sangathi', desc: 'Mark multiple variations of the same avarthanam' },
+            { icon: 'ɔ', label: 'Gap Fill', desc: 'Fill empty swara or sahitya cells per avarthanam' },
             { icon: '◐', label: 'Themes', desc: 'Six color themes — Parchment, Midnight, Forest, and more' },
           ].map((f) => (
             <div key={f.label} style={{ padding: '14px 16px', background: 'var(--parchment-dark)', borderRadius: 8, border: '1px solid rgba(201,151,58,0.2)' }}>

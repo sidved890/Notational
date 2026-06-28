@@ -159,15 +159,19 @@ export default function Dashboard() {
         padding: '16px 32px', borderBottom: '2px solid var(--gold)',
         background: 'linear-gradient(to bottom, var(--parchment-dark), var(--parchment))',
       }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--burgundy)', fontStyle: 'italic' }}>
-            Notational
+        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontFamily: 'var(--font-devanagari)', fontSize: 34, color: 'var(--burgundy)', lineHeight: 1 }}>न</span>
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, color: 'var(--burgundy)', fontStyle: 'italic' }}>
+              Notational
+            </div>
+            <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>
+              Carnatic Music Notation System
+            </div>
           </div>
-          <div style={{ color: 'var(--gold)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', fontFamily: 'var(--font-ui)' }}>
-            Carnatic Music Notation System
-          </div>
-        </div>
+        </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <a href="/library" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Library</a>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
           <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
           <ThemePicker theme={theme} onThemeChange={setTheme} compact />

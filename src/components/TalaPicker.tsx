@@ -159,7 +159,7 @@ export default function TalaPicker() {
           fontFamily: 'var(--font-serif)',
         }}
       >
-        {beats} beats per avartanam (Kalai {kalai})
+        {beats} beats per avarthanam ({kalai} Kalai)
       </div>
     </div>
   )
