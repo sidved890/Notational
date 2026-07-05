@@ -68,6 +68,20 @@ export default function AboutPage() {
           padding: '28px 32px', marginBottom: 32,
         }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, flexWrap: 'wrap' }}>
+            <img
+              src="/sidvedam.png"
+              alt="Siddharth Vedam"
+              style={{
+                width: 140,
+                height: 140,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                objectPosition: 'center top',
+                border: '3px solid var(--gold)',
+                boxShadow: '0 4px 16px var(--shadow)',
+                flexShrink: 0,
+              }}
+            />
             <div style={{ flex: 1, minWidth: 240 }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, color: 'var(--ink)', fontStyle: 'italic', marginBottom: 4 }}>
                 Siddharth Vedam
