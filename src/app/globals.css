@@ -1,0 +1,342 @@
+@import "tailwindcss";
+
+/* ════════════════════════════════════════════
+   DESIGN TOKENS
+════════════════════════════════════════════ */
+:root,
+body.theme-parchment {
+  --parchment: #F5EFE0;
+  --parchment-dark: #EDE4CC;
+  --parchment-darker: #E3D8B8;
+  --burgundy: #6B1E2E;
+  --burgundy-light: #8B2E42;
+  --gold: #C9973A;
+  --gold-light: #DEB96A;
+  --gold-faint: rgba(201,151,58,0.12);
+  --ink: #2A1A0E;
+  --ink-light: #5A3A28;
+  --ink-faint: rgba(42,26,14,0.4);
+  --anga-divider: rgba(107,30,46,0.55);
+  --beat-divider: rgba(201,151,58,0.35);
+  --cell-border: rgba(107,30,46,0.15);
+  --shadow: rgba(42,26,14,0.15);
+  --beat-group-alt: rgba(107,30,46,0.025);
+  --font-serif: var(--font-noto-serif, 'Noto Serif', Georgia, serif);
+  --font-display: var(--font-im-fell-english, 'IM Fell English', Georgia, serif);
+  --font-ui: var(--font-crimson-pro, 'Crimson Pro', Georgia, serif);
+}
+
+body.theme-midnight {
+  --parchment: #1A1208;
+  --parchment-dark: #221A0E;
+  --parchment-darker: #2A2014;
+  --burgundy: #C9973A;
+  --burgundy-light: #DEB96A;
+  --gold: #C9973A;
+  --gold-light: #DEB96A;
+  --gold-faint: rgba(201,151,58,0.15);
+  --ink: #E8DCC8;
+  --ink-light: #C8B898;
+  --ink-faint: rgba(232,220,200,0.4);
+  --cell-border: rgba(201,151,58,0.25);
+  --shadow: rgba(0,0,0,0.4);
+  --anga-divider: rgba(201,151,58,0.7);
+  --beat-divider: rgba(201,151,58,0.25);
+  --beat-group-alt: rgba(201,151,58,0.06);
+}
+
+body.theme-forest {
+  --parchment: #E8F0E6;
+  --parchment-dark: #D4E4D0;
+  --parchment-darker: #C0D4BA;
+  --burgundy: #2D4A32;
+  --burgundy-light: #3D6244;
+  --gold: #6B8F4E;
+  --gold-light: #8AAB72;
+  --gold-faint: rgba(107,143,78,0.14);
+  --ink: #1A2E1C;
+  --ink-light: #3D5240;
+  --ink-faint: rgba(26,46,28,0.42);
+  --anga-divider: rgba(45,74,50,0.5);
+  --beat-divider: rgba(107,143,78,0.35);
+  --cell-border: rgba(45,74,50,0.16);
+  --shadow: rgba(26,46,28,0.14);
+  --beat-group-alt: rgba(45,74,50,0.04);
+}
+
+body.theme-ocean {
+  --parchment: #E8F2F5;
+  --parchment-dark: #D0E4EC;
+  --parchment-darker: #B8D4E0;
+  --burgundy: #1A3D4F;
+  --burgundy-light: #2A5568;
+  --gold: #2A7B9B;
+  --gold-light: #4A9BB8;
+  --gold-faint: rgba(42,123,155,0.14);
+  --ink: #0F2533;
+  --ink-light: #2A4555;
+  --ink-faint: rgba(15,37,51,0.42);
+  --anga-divider: rgba(26,61,79,0.5);
+  --beat-divider: rgba(42,123,155,0.32);
+  --cell-border: rgba(26,61,79,0.16);
+  --shadow: rgba(15,37,51,0.14);
+  --beat-group-alt: rgba(26,61,79,0.04);
+}
+
+body.theme-slate {
+  --parchment: #F0F2F5;
+  --parchment-dark: #E2E6EB;
+  --parchment-darker: #D4D9E0;
+  --burgundy: #3D4451;
+  --burgundy-light: #525A68;
+  --gold: #6B7280;
+  --gold-light: #8B929E;
+  --gold-faint: rgba(107,114,128,0.14);
+  --ink: #1F2937;
+  --ink-light: #4B5563;
+  --ink-faint: rgba(31,41,55,0.42);
+  --anga-divider: rgba(61,68,81,0.45);
+  --beat-divider: rgba(107,114,128,0.3);
+  --cell-border: rgba(61,68,81,0.14);
+  --shadow: rgba(31,41,55,0.12);
+  --beat-group-alt: rgba(61,68,81,0.035);
+}
+
+body.theme-rosewood {
+  --parchment: #FAF0F0;
+  --parchment-dark: #F0E0E0;
+  --parchment-darker: #E6D0D0;
+  --burgundy: #7A2838;
+  --burgundy-light: #943848;
+  --gold: #B86B6B;
+  --gold-light: #D08A8A;
+  --gold-faint: rgba(184,107,107,0.14);
+  --ink: #3A1A1A;
+  --ink-light: #5A3838;
+  --ink-faint: rgba(58,26,26,0.42);
+  --anga-divider: rgba(122,40,56,0.48);
+  --beat-divider: rgba(184,107,107,0.32);
+  --cell-border: rgba(122,40,56,0.15);
+  --shadow: rgba(58,26,26,0.12);
+  --beat-group-alt: rgba(122,40,56,0.035);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 7px 16px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1.5px solid;
+  letter-spacing: 0.03em;
+}
+
+.btn-primary {
+  background: var(--burgundy);
+  border-color: var(--burgundy);
+  color: var(--parchment);
+}
+.btn-primary:hover { background: var(--burgundy-light); }
+
+.btn-secondary {
+  background: transparent;
+  border-color: var(--burgundy);
+  color: var(--burgundy);
+}
+.btn-secondary:hover { background: rgba(107,30,46,0.08); }
+
+.btn-gold {
+  background: transparent;
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.btn-gold:hover { background: var(--gold-faint); }
+
+.btn-icon { padding: 7px 10px; font-size: 15px; line-height: 1; }
+
+/* ── NOTATION CELL ── */
+.cell-swara, .cell-sahitya {
+  border: none;
+  background: transparent;
+  font-family: var(--font-serif);
+  color: var(--ink);
+  text-align: center;
+  width: 100%;
+  padding: 3px 2px;
+  outline: none;
+  min-width: 0;
+  caret-color: var(--burgundy);
+}
+
+.cell-swara {
+  font-size: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(107,30,46,0.08);
+  height: 32px;
+}
+
+.cell-swara.cell-karvai {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cell-sahitya {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--ink-light);
+  opacity: 0.7;
+  height: 22px;
+}
+
+.notation-cell:focus-within {
+  background: rgba(201,151,58,0.13);
+  box-shadow: inset 0 0 0 1.5px var(--gold);
+  z-index: 1;
+}
+
+.cell-swara:focus,
+.cell-sahitya:focus {
+  background: rgba(201,151,58,0.06);
+}
+
+/* Beat group alternating */
+.beat-group-alt { background: var(--beat-group-alt); }
+
+/* Playback highlight */
+.playback-hl {
+  outline: 2.5px solid var(--gold) !important;
+  outline-offset: -1px;
+  background: rgba(201,151,58,0.2) !important;
+}
+
+/* ── FIELD INPUT ── */
+.field-input {
+  padding: 7px 11px;
+  background: var(--parchment);
+  border: 1.5px solid rgba(107,30,46,0.25);
+  border-radius: 4px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201,151,58,0.2);
+}
+
+/* ── HEADING INPUT ── */
+.heading-label-input {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--burgundy);
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  outline: none;
+  min-width: 140px;
+  width: auto;
+  max-width: 300px;
+  caret-color: var(--burgundy);
+}
+.heading-label-input::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+/* ── BEAT SYMBOLS ── */
+.beat-sym-X { color: var(--burgundy); font-weight: 800; }
+.beat-sym-V { color: var(--gold); font-style: italic; }
+.beat-sym-num { color: var(--ink-light); opacity: 0.7; }
+
+/* ── AUTH AVATAR ── */
+.auth-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  object-fit: cover;
+}
+
+/* ── KBD ── */
+kbd {
+  display: inline-block;
+  background: var(--parchment-dark);
+  border: 1.5px solid rgba(107,30,46,0.3);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--burgundy);
+  box-shadow: 0 1px 0 rgba(107,30,46,0.2);
+}
+
+/* ── PRINT ── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .cell-swara { font-size: 12px; }
+  .cell-sahitya { font-size: 10px; }
+  .grid-zoom-inner { transform: none !important; width: 100% !important; }
+  .grid-wrapper { border: 1px solid #ccc !important; box-shadow: none !important; }
+  .metadata-panel { border: none !important; box-shadow: none !important; background: white !important; }
+
+  /* Show print-only header */
+  .print-header { display: block !important; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #333; }
+  .print-title {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: black;
+    margin-bottom: 4px;
+  }
+  .print-subtitle {
+    font-family: Georgia, serif;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+  .print-raga-info {
+    font-family: Georgia, serif;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.6;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+    margin-top: 6px;
+  }
+
+  /* Hide AV numbers in print */
+  .avartanam-label-col { display: none !important; }
+
+  /* Tighter grid for print */
+  .avartanam-container { page-break-inside: avoid; }
+  .section-heading-row { page-break-after: avoid; }
+
+  /* Row actions never print */
+  .row-actions { display: none !important; }
+}
