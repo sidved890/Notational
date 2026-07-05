@@ -30,10 +30,19 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
 
   function focusCell(rowIndex: number, cellIndex: number, type: 'swara' | 'sahitya') {
     const el = document.querySelector<HTMLInputElement>(`[data-row-index="${rowIndex}"][data-cell="${cellIndex}"][data-type="${type}"]`)
-    if (el) { el.focus(); if (type === 'swara') el.setSelectionRange(el.value.length, el.value.length) }
+    if (el) {
+      el.focus()
+      const pos = el.value.length
+      el.setSelectionRange(pos, pos)
+    }
   }
 
-  const handleNavigate = useCallback((rowIndex: number, cellIndex: number, direction: 'left' | 'right' | 'up' | 'down' | 'swara' | 'sahitya' | 'prevSwara') => {
+  const handleNavigate = useCallback((
+    rowIndex: number,
+    cellIndex: number,
+    direction: 'left' | 'right' | 'up' | 'down' | 'swara' | 'sahitya' | 'prevSwara',
+    field: 'swara' | 'sahitya' = 'swara',
+  ) => {
     const curNotPos = notationRowIndices.indexOf(rowIndex)
     switch (direction) {
       case 'sahitya': focusCell(rowIndex, cellIndex, 'sahitya'); break
@@ -45,7 +54,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
           if (np >= notationRowIndices.length) return
           nr = notationRowIndices[np]; nc = 0
         }
-        focusCell(nr, nc, 'swara'); break
+        focusCell(nr, nc, field); break
       }
       case 'left': {
         let nc = cellIndex - 1, nr = rowIndex
@@ -54,7 +63,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
           if (np < 0) return
           nr = notationRowIndices[np]; nc = cellCount - 1
         }
-        focusCell(nr, nc, 'swara'); break
+        focusCell(nr, nc, field); break
       }
       case 'prevSwara': {
         let nc = cellIndex - 1, nr = rowIndex
@@ -68,12 +77,15 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
       case 'down': {
         const np = curNotPos + 1
         if (np >= notationRowIndices.length) return
-        focusCell(notationRowIndices[np], Math.min(cellIndex, cellCount - 1), 'swara'); break
+        focusCell(notationRowIndices[np], Math.min(cellIndex, cellCount - 1), field); break
       }
       case 'up': {
         const np = curNotPos - 1
-        if (np < 0) return
-        focusCell(notationRowIndices[np], Math.min(cellIndex, cellCount - 1), 'swara'); break
+        if (np < 0) {
+          if (field === 'sahitya') focusCell(rowIndex, cellIndex, 'swara')
+          return
+        }
+        focusCell(notationRowIndices[np], Math.min(cellIndex, cellCount - 1), field); break
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

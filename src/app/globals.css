@@ -193,6 +193,11 @@ html, body {
   height: 32px;
 }
 
+.cell-swara.cell-karvai {
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .cell-sahitya {
   font-size: 10px;
   font-style: italic;

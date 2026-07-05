@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useComposition } from '@/context/CompositionContext'
+import { reverseScale } from '@/lib/raga-utils'
 import TalaPicker from './TalaPicker'
 
 export default function MetadataPanel() {
@@ -89,7 +90,22 @@ export default function MetadataPanel() {
               ◆ Raga Overview
             </div>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--ink-light)', cursor: 'pointer' }}>
-              <input type="checkbox" checked={!!meta.isJanya} onChange={(e) => update('isJanya', e.target.checked)} style={{ accentColor: 'var(--burgundy)' }} />
+              <input
+                type="checkbox"
+                checked={!!meta.isJanya}
+                onChange={(e) => {
+                  const isJanya = e.target.checked
+                  if (!isJanya && meta.arohanam) {
+                    dispatch({
+                      type: 'UPDATE_META',
+                      payload: { isJanya: false, avarohanam: reverseScale(meta.arohanam) },
+                    })
+                  } else {
+                    update('isJanya', isJanya)
+                  }
+                }}
+                style={{ accentColor: 'var(--burgundy)' }}
+              />
               Janya raga
             </label>
           </div>
@@ -105,11 +121,45 @@ export default function MetadataPanel() {
           )}
 
           <FieldGroup label="Arohanam (Ascending)">
-            <input id="raga-arohanam" name="raga-arohanam" autoComplete="off" className="field-input" type="text" value={meta.arohanam || ''} placeholder="e.g. S R2 G3 M1 P D2 N3 Ṡ" onChange={(e) => update('arohanam', e.target.value)} style={{ fontFamily: 'var(--font-serif)' }} />
+            <input
+              id="raga-arohanam"
+              name="raga-arohanam"
+              autoComplete="off"
+              className="field-input"
+              type="text"
+              value={meta.arohanam || ''}
+              placeholder="e.g. S R2 G3 M1 P D2 N3 Ṡ"
+              onChange={(e) => {
+                const arohanam = e.target.value
+                if (!meta.isJanya) {
+                  dispatch({
+                    type: 'UPDATE_META',
+                    payload: { arohanam, avarohanam: reverseScale(arohanam) },
+                  })
+                } else {
+                  update('arohanam', arohanam)
+                }
+              }}
+              style={{ fontFamily: 'var(--font-serif)' }}
+            />
           </FieldGroup>
 
-          <FieldGroup label="Avarohanam (Descending)">
-            <input id="raga-avarohanam" name="raga-avarohanam" autoComplete="off" className="field-input" type="text" value={meta.avarohanam || ''} placeholder="e.g. Ṡ N3 D2 P M1 G3 R2 S" onChange={(e) => update('avarohanam', e.target.value)} style={{ fontFamily: 'var(--font-serif)' }} />
+          <FieldGroup label={meta.isJanya ? 'Avarohanam (Descending)' : 'Avarohanam (auto from arohanam)'}>
+            <input
+              id="raga-avarohanam"
+              name="raga-avarohanam"
+              autoComplete="off"
+              className="field-input"
+              type="text"
+              value={meta.avarohanam || ''}
+              placeholder={meta.isJanya ? 'e.g. Ṡ N3 D2 P M1 G3 R2 S' : 'Derived automatically'}
+              readOnly={!meta.isJanya}
+              onChange={(e) => update('avarohanam', e.target.value)}
+              style={{
+                fontFamily: 'var(--font-serif)',
+                ...(!meta.isJanya ? { opacity: 0.75, cursor: 'default', fontStyle: 'italic' } : {}),
+              }}
+            />
           </FieldGroup>
         </div>
       )}

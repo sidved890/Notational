@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, RefObject } from 'react'
 import { useComposition } from '@/context/CompositionContext'
+import { KARVAI_CHAR } from '@/lib/notation-constants'
 
 // Character substitutions for swara input
 const DOT_BELOW: Record<string, string> = {
@@ -62,6 +63,7 @@ type Props = {
     rowIndex: number,
     cellIndex: number,
     direction: 'left' | 'right' | 'up' | 'down' | 'swara' | 'sahitya' | 'prevSwara',
+    field?: 'swara' | 'sahitya',
   ) => void
 }
 
@@ -168,6 +170,7 @@ export default function NotationCell({
   }
 
   function handleSahityaKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    const input = e.currentTarget
     switch (e.key) {
       case 'Enter':
         e.preventDefault()
@@ -181,16 +184,30 @@ export default function NotationCell({
           onNavigate(rowIndex, cellIndex, 'right')
         }
         break
+      case 'ArrowRight':
+        if (input.selectionStart === input.value.length) {
+          e.preventDefault()
+          onNavigate(rowIndex, cellIndex, 'right', 'sahitya')
+        }
+        break
+      case 'ArrowLeft':
+        if (input.selectionStart === 0) {
+          e.preventDefault()
+          onNavigate(rowIndex, cellIndex, 'left', 'sahitya')
+        }
+        break
       case 'ArrowUp':
         e.preventDefault()
-        onNavigate(rowIndex, cellIndex, 'swara') // ↑ from sahitya → swara (same cell)
+        onNavigate(rowIndex, cellIndex, 'up', 'sahitya')
         break
       case 'ArrowDown':
         e.preventDefault()
-        onNavigate(rowIndex, cellIndex, 'down') // ↓ from sahitya → next avartanam, same column
+        onNavigate(rowIndex, cellIndex, 'down', 'sahitya')
         break
     }
   }
+
+  const isKarvai = swara === KARVAI_CHAR
 
   return (
     <div
@@ -208,7 +225,7 @@ export default function NotationCell({
     >
       <input
         ref={swaraRef}
-        className="cell-swara"
+        className={`cell-swara${isKarvai ? ' cell-karvai' : ''}`}
         type="text"
         value={swara}
         autoComplete="off"
@@ -220,7 +237,7 @@ export default function NotationCell({
         onChange={handleSwaraChange}
         onKeyUp={handleSwaraKeyUp}
         onKeyDown={handleSwaraKeyDown}
-        style={sangati ? { color: 'var(--burgundy)', fontStyle: 'italic' } : {}}
+        style={sangati && !isKarvai ? { color: 'var(--burgundy)', fontStyle: 'italic' } : {}}
       />
       <input
         ref={sahityaRef}
