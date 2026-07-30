@@ -118,6 +118,20 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
 
   let notNum = 0
 
+  const BEAT_GAP = 10
+
+  function BeatDivider({ isAngaStart }: { isAngaStart: boolean }) {
+    return (
+      <div style={{ width: BEAT_GAP, minWidth: BEAT_GAP, flexShrink: 0, position: 'relative' }}>
+        <div style={{
+          position: 'absolute', left: '50%', top: 0, bottom: 0,
+          width: isAngaStart ? 2.5 : 1, transform: 'translateX(-50%)',
+          background: isAngaStart ? 'var(--anga-divider)' : 'var(--beat-divider)',
+        }} />
+      </div>
+    )
+  }
+
   return (
     <div ref={wrapperRef} className="grid-wrapper" style={{
       background: 'var(--parchment-dark)', border: '1.5px solid rgba(201,151,58,0.4)',
@@ -189,11 +203,14 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                   )}
                 </div>
                 {pattern.map((slot, bi) => (
-                  <div key={bi} style={{ flex: 1, display: 'flex', flexDirection: 'column', borderLeft: slot.isAngaStart ? (bi === 0 ? 'none' : '2.5px solid var(--anga-divider)') : '1px solid var(--beat-divider)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '3px 2px' }}>
-                      <span className={`beat-sym beat-sym-${slot.symbolClass}`} style={{ fontSize: 10, lineHeight: 1, fontFamily: 'var(--font-serif)', fontWeight: 800 }}>{slot.symbol}</span>
+                  <div key={bi} style={{ display: 'contents' }}>
+                    {bi > 0 && <BeatDivider isAngaStart={slot.isAngaStart} />}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '3px 2px' }}>
+                        <span className={`beat-sym beat-sym-${slot.symbolClass}`} style={{ fontSize: 10, lineHeight: 1, fontFamily: 'var(--font-serif)', fontWeight: 800 }}>{slot.symbol}</span>
+                      </div>
+                      <div style={{ height: 0 }} />
                     </div>
-                    <div style={{ height: 0 }} />
                   </div>
                 ))}
 
@@ -228,26 +245,26 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
               <div style={{ display: 'flex', alignItems: 'stretch', background: sangathiNum && sangathiNum > 1 ? 'rgba(201,151,58,0.04)' : undefined }}>
                 <div style={{ width: 60, minWidth: 60, flexShrink: 0, borderRight: '2px solid var(--anga-divider)', borderLeft: sangathiNum && sangathiNum > 1 ? '3px solid rgba(201,151,58,0.4)' : '3px solid transparent' }} />
                 {pattern.map((slot, bi) => (
-                  <div key={bi} className={bi % 2 === 1 ? 'beat-group-alt' : ''} style={{
-                    flex: 1, display: 'flex',
-                    borderLeft: slot.isAngaStart ? (bi === 0 ? 'none' : '2.5px solid var(--anga-divider)') : '1px solid var(--beat-divider)',
-                  }}>
-                    {Array.from({ length: meta.maatras }, (_, m) => {
-                      const cellIndex = bi * meta.maatras + m
-                      const cellData = row.cells[cellIndex] || { swara: '', sahitya: '' }
-                      return (
-                        <NotationCell
-                          key={cellIndex}
-                          rowIndex={rowIndex}
-                          cellIndex={cellIndex}
-                          swara={cellData.swara}
-                          sahitya={cellData.sahitya}
-                          sangati={cellData.sangati}
-                          isPlaybackHl={playbackCell?.rowIndex === rowIndex && playbackCell?.cellIndex === cellIndex}
-                          onNavigate={handleNavigate}
-                        />
-                      )
-                    })}
+                  <div key={bi} style={{ display: 'contents' }}>
+                    {bi > 0 && <BeatDivider isAngaStart={slot.isAngaStart} />}
+                    <div className={bi % 2 === 1 ? 'beat-group-alt' : ''} style={{ flex: 1, display: 'flex' }}>
+                      {Array.from({ length: meta.maatras }, (_, m) => {
+                        const cellIndex = bi * meta.maatras + m
+                        const cellData = row.cells[cellIndex] || { swara: '', sahitya: '' }
+                        return (
+                          <NotationCell
+                            key={cellIndex}
+                            rowIndex={rowIndex}
+                            cellIndex={cellIndex}
+                            swara={cellData.swara}
+                            sahitya={cellData.sahitya}
+                            sangati={cellData.sangati}
+                            isPlaybackHl={playbackCell?.rowIndex === rowIndex && playbackCell?.cellIndex === cellIndex}
+                            onNavigate={handleNavigate}
+                          />
+                        )
+                      })}
+                    </div>
                   </div>
                 ))}
               </div>

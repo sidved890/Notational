@@ -66,6 +66,11 @@ export default function Toolbar({
       try {
         const data = JSON.parse(ev.target?.result as string)
         const loaded = deserializeState(data)
+        // Importing a file's notation content shouldn't change this session's
+        // cloud identity/visibility (e.g. the Public/Private choice already made).
+        loaded.isPublic = state.isPublic
+        loaded.shareId = state.shareId
+        loaded.cloudId = state.cloudId
         dispatch({ type: 'LOAD_COMPOSITION', state: loaded })
       } catch {
         alert('Invalid Notational JSON file.')
