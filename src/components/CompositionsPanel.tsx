@@ -73,6 +73,8 @@ export default function CompositionsPanel({ isOpen, onClose, user, onNew }: Prop
         },
         rows: d.rows,
         cloudId: snap.id,
+        isPublic: d.isPublic,
+        shareId: d.shareId,
       })
       dispatch({ type: 'LOAD_COMPOSITION', state: loaded })
       onClose()
