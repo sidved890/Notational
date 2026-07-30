@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useCallback, useState, useEffect, useLayoutEffect } from 'react'
+import { useRef, useCallback, useState, useEffect, useLayoutEffect, RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { useComposition } from '@/context/CompositionContext'
 import { getTalaPattern, getCellCount, TalaBase, Jathi } from '@/lib/tala'
@@ -13,13 +13,17 @@ const SECTION_PRESETS = ['Pallavi', 'Anupallavi', 'Charanam', 'Chittaswaram', 'M
 type Props = {
   zoom: number
   playbackCell: { rowIndex: number; cellIndex: number } | null
+  readOnly?: boolean
 }
 
-export default function NotationGrid({ zoom, playbackCell }: Props) {
+export default function NotationGrid({ zoom, playbackCell, readOnly }: Props) {
   const { state, dispatch } = useComposition()
   const { rows, meta } = state
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [hoveredInsert, setHoveredInsert] = useState<number | null>(null)
+  const [enterIndex, setEnterIndex] = useState<number | null>(null)
+  const [exitIndex, setExitIndex] = useState<number | null>(null)
+  const [flashIndices, setFlashIndices] = useState<Set<number>>(new Set())
 
   const talaBase = meta.talaBase as TalaBase
   const jathi = meta.jathi as Jathi
@@ -91,7 +95,13 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notationRowIndices, cellCount])
 
+  function flashEnter(rowIndex: number) {
+    setEnterIndex(rowIndex)
+    setTimeout(() => setEnterIndex((cur) => (cur === rowIndex ? null : cur)), 220)
+  }
+
   function addRow() {
+    flashEnter(rows.length)
     dispatch({ type: 'ADD_ROW' })
     setTimeout(() => {
       const containers = document.querySelectorAll('.avartanam-container')
@@ -100,6 +110,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
   }
 
   function addHeading() {
+    flashEnter(rows.length)
     dispatch({ type: 'ADD_HEADING' })
     setTimeout(() => {
       const inputs = document.querySelectorAll<HTMLInputElement>('.heading-label-input')
@@ -108,12 +119,26 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
   }
 
   function insertWithPreset(rowIndex: number, label: string) {
+    flashEnter(rowIndex)
     dispatch({ type: 'INSERT_HEADING_BEFORE', rowIndex })
     if (label) {
       // Update heading label after insert — heading will be at rowIndex
       setTimeout(() => dispatch({ type: 'UPDATE_HEADING', rowIndex, label }), 10)
     }
     setHoveredInsert(null)
+  }
+
+  function moveRow(rowIndex: number, direction: 'up' | 'down') {
+    const target = direction === 'up' ? rowIndex - 1 : rowIndex + 1
+    if (target < 0 || target >= rows.length) return
+    setFlashIndices(new Set([rowIndex, target]))
+    dispatch({ type: 'MOVE_ROW', rowIndex, direction })
+    setTimeout(() => setFlashIndices(new Set()), 220)
+  }
+
+  function requestDeleteRow(rowIndex: number) {
+    setExitIndex(rowIndex)
+    setTimeout(() => dispatch({ type: 'DELETE_ROW', rowIndex }), 180)
   }
 
   let notNum = 0
@@ -136,6 +161,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
     <div ref={wrapperRef} className="grid-wrapper" style={{
       background: 'var(--parchment-dark)', border: '1.5px solid rgba(201,151,58,0.4)',
       borderRadius: 8, boxShadow: '0 2px 12px var(--shadow)', overflow: 'hidden',
+      position: 'relative',
     }}>
       <div className="grid-zoom-inner" style={{
         transform: `scale(${zoom})`, transformOrigin: 'top left',
@@ -144,7 +170,14 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
         {rows.map((row, rowIndex) => {
           if (row.type === 'heading') {
             return (
-              <SectionHeading key={`h-${rowIndex}`} rowIndex={rowIndex} label={row.label} />
+              <SectionHeading
+                key={`h-${rowIndex}`}
+                rowIndex={rowIndex}
+                label={row.label}
+                readOnly={readOnly}
+                onMove={moveRow}
+                animClass={enterIndex === rowIndex ? 'row-enter-anim' : flashIndices.has(rowIndex) ? 'row-flash-anim' : ''}
+              />
             )
           }
 
@@ -153,10 +186,13 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
           const sangathiNum = row.sangathiNumber
           const isFirst = rowIndex === 0 || rows[rowIndex - 1]?.type === 'heading'
 
+          const animClass = exitIndex === rowIndex ? 'row-exit-anim' : enterIndex === rowIndex ? 'row-enter-anim' : flashIndices.has(rowIndex) ? 'row-flash-anim' : ''
+
           return (
-            <div key={`n-${rowIndex}`} className="avartanam-container" data-row-index={rowIndex} style={{ borderBottom: '1.5px solid rgba(201,151,58,0.25)', position: 'relative' }}>
+            <div key={`n-${rowIndex}`} className={`avartanam-container ${animClass}`} data-row-index={rowIndex} style={{ borderBottom: '1.5px solid rgba(201,151,58,0.25)', position: 'relative' }}>
 
               {/* Insert-between strip (hover target above this row) */}
+              {!readOnly && (
               <div
                 style={{ height: 4, cursor: 'pointer', position: 'relative', zIndex: 10 }}
                 onMouseEnter={() => setHoveredInsert(rowIndex)}
@@ -183,7 +219,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                       background: 'transparent', color: 'var(--gold)', fontSize: 11,
                       fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-ui)',
                     }}>Custom…</button>
-                    <button onClick={() => { dispatch({ type: 'INSERT_ROW_AFTER', rowIndex: rowIndex - 1 }); setHoveredInsert(null) }} style={{
+                    <button onClick={() => { flashEnter(rowIndex); dispatch({ type: 'INSERT_ROW_AFTER', rowIndex: rowIndex - 1 }); setHoveredInsert(null) }} style={{
                       padding: '2px 8px', borderRadius: 12, border: '1.5px solid rgba(107,30,46,0.25)',
                       background: 'transparent', color: 'var(--ink-light)', fontSize: 11,
                       fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-ui)',
@@ -191,6 +227,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                   </div>
                 )}
               </div>
+              )}
 
               {/* Beat header */}
               <div style={{ display: 'flex', alignItems: 'stretch', background: 'linear-gradient(to bottom, rgba(107,30,46,0.07), transparent)', borderBottom: '1px solid rgba(107,30,46,0.12)' }}>
@@ -215,6 +252,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                 ))}
 
                 {/* Row actions */}
+                {!readOnly && (
                 <div className="row-actions no-print" style={{ display: 'none', alignItems: 'center', gap: 2, padding: '0 4px', flexShrink: 0 }}>
                   <RowActionBtn
                     title={`Fill empty swara cells with karvai (${KARVAI_CHAR})`}
@@ -228,8 +266,8 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                   >
                     —
                   </RowActionBtn>
-                  <button onClick={() => dispatch({ type: 'MOVE_ROW', rowIndex, direction: 'up' })} disabled={rowIndex === 0} title="Move up" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▲</button>
-                  <button onClick={() => dispatch({ type: 'MOVE_ROW', rowIndex, direction: 'down' })} disabled={rowIndex === rows.length - 1} title="Move down" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▼</button>
+                  <button onClick={() => moveRow(rowIndex, 'up')} disabled={rowIndex === 0} title="Move up" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▲</button>
+                  <button onClick={() => moveRow(rowIndex, 'down')} disabled={rowIndex === rows.length - 1} title="Move down" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 12, padding: '2px', lineHeight: 1 }}>▼</button>
                   <RowActionBtn
                     title="Duplicate this avarthanam as a new sangathi"
                     onClick={() => dispatch({ type: 'DUPLICATE_AS_SANGATHI', rowIndex })}
@@ -237,8 +275,9 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                     +S
                   </RowActionBtn>
                   <SangathiPicker rowIndex={rowIndex} current={sangathiNum} />
-                  <button onClick={() => { if (rows.filter(r => r.type === 'notation').length > 1 && confirm('Delete this avarthanam?')) dispatch({ type: 'DELETE_ROW', rowIndex }) }} title="Delete" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 14, padding: '2px', lineHeight: 1 }}>×</button>
+                  <button onClick={() => { if (rows.filter(r => r.type === 'notation').length > 1 && confirm('Delete this avarthanam?')) requestDeleteRow(rowIndex) }} title="Delete" style={{ background: 'none', border: 'none', color: 'var(--ink-faint)', cursor: 'pointer', fontSize: 14, padding: '2px', lineHeight: 1 }}>×</button>
                 </div>
+                )}
               </div>
 
               {/* Notation row */}
@@ -260,6 +299,7 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
                             sahitya={cellData.sahitya}
                             sangati={cellData.sangati}
                             isPlaybackHl={playbackCell?.rowIndex === rowIndex && playbackCell?.cellIndex === cellIndex}
+                            readOnly={readOnly}
                             onNavigate={handleNavigate}
                           />
                         )
@@ -273,20 +313,68 @@ export default function NotationGrid({ zoom, playbackCell }: Props) {
         })}
 
         {/* Bottom add buttons */}
+        {!readOnly && (
         <div style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, borderTop: '1px dashed rgba(201,151,58,0.35)', flexWrap: 'wrap' }}>
           <button onClick={addRow} className="btn-add-row">+ Add Avartanam</button>
           <span style={{ color: 'var(--ink-faint)', fontSize: 12 }}>·</span>
           <button onClick={addHeading} className="btn-add-row">§ Add Section Heading</button>
         </div>
+        )}
       </div>
+
+      {!readOnly && <PlaybackHighlightOverlay playbackCell={playbackCell} wrapperRef={wrapperRef} />}
 
       <style>{`
         .avartanam-container:hover .row-actions { display: flex !important; }
         .avartanam-container:last-of-type { border-bottom: none !important; }
         .btn-add-row { background: transparent; border: none; color: var(--gold); font-family: var(--font-ui); font-size: 13px; font-weight: 600; cursor: pointer; padding: 5px 16px; border-radius: 4px; transition: background 0.15s; letter-spacing: 0.04em; }
         .btn-add-row:hover { background: var(--gold-faint); }
+
+        @keyframes row-enter { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes row-flash { 0% { opacity: 1; } 45% { opacity: 0.4; } 100% { opacity: 1; } }
+        .row-enter-anim { animation: row-enter 0.2s ease; }
+        .row-flash-anim { animation: row-flash 0.22s ease; }
+        .row-exit-anim { opacity: 0; transform: translateY(-6px); transition: opacity 0.18s ease, transform 0.18s ease; }
       `}</style>
     </div>
+  )
+}
+
+function PlaybackHighlightOverlay({
+  playbackCell,
+  wrapperRef,
+}: {
+  playbackCell: { rowIndex: number; cellIndex: number } | null
+  wrapperRef: RefObject<HTMLDivElement | null>
+}) {
+  const [rect, setRect] = useState<{ left: number; top: number; width: number; height: number } | null>(null)
+
+  useLayoutEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!playbackCell || !wrapper) { setRect(null); return }
+    const el = wrapper.querySelector<HTMLElement>(
+      `.notation-cell[data-row-index="${playbackCell.rowIndex}"][data-cell="${playbackCell.cellIndex}"]`
+    )
+    if (!el) { setRect(null); return }
+    const wrapperBox = wrapper.getBoundingClientRect()
+    const cellBox = el.getBoundingClientRect()
+    setRect({
+      left: cellBox.left - wrapperBox.left + wrapper.scrollLeft,
+      top: cellBox.top - wrapperBox.top + wrapper.scrollTop,
+      width: cellBox.width,
+      height: cellBox.height,
+    })
+  }, [playbackCell, wrapperRef])
+
+  if (!rect) return null
+
+  return (
+    <div style={{
+      position: 'absolute', left: rect.left, top: rect.top, width: rect.width, height: rect.height,
+      border: '2px solid var(--gold)', borderRadius: 3, pointerEvents: 'none', zIndex: 5,
+      boxShadow: '0 0 6px rgba(201,151,58,0.6)',
+      transition: 'left 0.15s ease, top 0.15s ease, width 0.15s ease, height 0.15s ease',
+    }} />
   )
 }
 

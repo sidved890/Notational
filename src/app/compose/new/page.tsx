@@ -49,7 +49,7 @@ function VisibilityPicker({ onPick }: { onPick: (isPublic: boolean) => void }) {
         background: 'linear-gradient(to bottom, var(--parchment-dark), var(--parchment))',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)' }}>← Dashboard</a>
+          <a href="/dashboard" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)' }}>← Dashboard</a>
           <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontFamily: 'var(--font-devanagari)', fontSize: 28, color: 'var(--burgundy)', lineHeight: 1 }}>न</span>
             <div>

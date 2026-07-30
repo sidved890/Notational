@@ -56,6 +56,8 @@ export type CloudComposition = {
   folder?: string | null
   isPublic?: boolean
   shareId?: string
+  creatorName?: string
+  creatorPhotoURL?: string | null
   updatedAt?: { toDate?: () => Date } | null
   createdAt?: { toDate?: () => Date } | null
 }
