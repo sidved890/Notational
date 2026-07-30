@@ -68,7 +68,7 @@ export default function LibraryPage() {
           </div>
         </a>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <a href="/" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Dashboard</a>
+          <a href="/dashboard" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Dashboard</a>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
           <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
           <ThemePicker theme={theme} onThemeChange={setTheme} compact />
@@ -177,6 +177,15 @@ export default function LibraryPage() {
                       )}
                       {comp.composer && (
                         <div style={{ color: 'var(--ink-faint)', fontSize: 12 }}>{comp.composer}</div>
+                      )}
+                      {comp.creatorName && (
+                        <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          {comp.creatorPhotoURL && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={comp.creatorPhotoURL} alt="" style={{ width: 16, height: 16, borderRadius: '50%', objectFit: 'cover' }} />
+                          )}
+                          <span style={{ color: 'var(--ink-faint)', fontSize: 11, fontStyle: 'italic' }}>by {comp.creatorName}</span>
+                        </div>
                       )}
                       <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{

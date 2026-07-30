@@ -23,7 +23,7 @@ export default function TutorialPage() {
           </a>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
+          <a href="/dashboard" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
           <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
           <ThemePicker theme={theme} onThemeChange={setTheme} compact />
         </div>
@@ -135,7 +135,7 @@ export default function TutorialPage() {
         <div style={{ borderTop: '1px solid rgba(201,151,58,0.3)', margin: '44px 0 28px' }} />
         <div style={{ textAlign: 'center' }}>
           <a href="/compose/new" className="btn btn-primary" style={{ marginRight: 12 }}>Start Notating</a>
-          <a href="/" className="btn btn-secondary">Back to Dashboard</a>
+          <a href="/dashboard" className="btn btn-secondary">Back to Dashboard</a>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 48 }}>

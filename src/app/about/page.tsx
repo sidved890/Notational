@@ -1,6 +1,7 @@
 'use client'
 
 import ThemePicker from '@/components/ThemePicker'
+import FeatureGrid from '@/components/FeatureGrid'
 import { useTheme } from '@/hooks/useTheme'
 
 export default function AboutPage() {
@@ -21,7 +22,7 @@ export default function AboutPage() {
           </div>
         </a>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
+          <a href="/dashboard" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontWeight: 600 }}>← Dashboard</a>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
           <ThemePicker theme={theme} onThemeChange={setTheme} compact />
         </div>
@@ -104,23 +105,8 @@ export default function AboutPage() {
         </div>
 
         {/* Feature highlights */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 40 }}>
-          {[
-            { icon: '♩', label: '35 Talam System', desc: '7 base talams × 5 jathis, plus Misra/Khanda Chapu' },
-            { icon: '◆', label: 'Section Headings', desc: 'Pallavi, Anupallavi, Charanam and custom labels' },
-            { icon: '☁', label: 'Cloud Storage', desc: 'Save and access your compositions anywhere' },
-            { icon: '↗', label: 'Share', desc: 'Generate a public link for any composition' },
-            { icon: '⎙', label: 'Print Ready', desc: 'Clean print output with raga info header' },
-            { icon: 'S#', label: 'Sangathi', desc: 'Mark multiple variations of the same avarthanam' },
-            { icon: 'ɔ', label: 'Gap Fill', desc: 'Fill empty swara or sahitya cells per avarthanam' },
-            { icon: '◐', label: 'Themes', desc: 'Six color themes — Parchment, Midnight, Forest, and more' },
-          ].map((f) => (
-            <div key={f.label} style={{ padding: '14px 16px', background: 'var(--parchment-dark)', borderRadius: 8, border: '1px solid rgba(201,151,58,0.2)' }}>
-              <div style={{ fontSize: 18, color: 'var(--gold)', marginBottom: 6, fontFamily: 'var(--font-serif)' }}>{f.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--burgundy)', marginBottom: 3, fontFamily: 'var(--font-ui)' }}>{f.label}</div>
-              <div style={{ fontSize: 12, color: 'var(--ink-faint)', lineHeight: 1.5 }}>{f.desc}</div>
-            </div>
-          ))}
+        <div style={{ marginBottom: 40 }}>
+          <FeatureGrid />
         </div>
 
         {/* Divider */}
@@ -128,7 +114,7 @@ export default function AboutPage() {
 
         <div style={{ textAlign: 'center' }}>
           <a href="/compose/new" className="btn btn-primary" style={{ marginRight: 12 }}>Start Notating</a>
-          <a href="/" className="btn btn-secondary">View Dashboard</a>
+          <a href="/dashboard" className="btn btn-secondary">View Dashboard</a>
           <p style={{ marginTop: 20, color: 'var(--ink-faint)', fontSize: 12, fontStyle: 'italic' }}>
             Built with Next.js, React, TypeScript, and Firebase
           </p>

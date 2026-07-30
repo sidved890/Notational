@@ -59,6 +59,7 @@ type Props = {
   sahitya: string
   sangati?: boolean
   isPlaybackHl?: boolean
+  readOnly?: boolean
   onNavigate: (
     rowIndex: number,
     cellIndex: number,
@@ -74,6 +75,7 @@ export default function NotationCell({
   sahitya,
   sangati,
   isPlaybackHl,
+  readOnly,
   onNavigate,
 }: Props) {
   const { dispatch } = useComposition()
@@ -208,6 +210,27 @@ export default function NotationCell({
   }
 
   const isKarvai = swara === KARVAI_CHAR
+
+  if (readOnly) {
+    return (
+      <div
+        className={`notation-cell${sangati ? ' sangati' : ''}${isPlaybackHl ? ' playback-hl' : ''}`}
+        data-row-index={rowIndex}
+        data-cell={cellIndex}
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          borderLeft: '1px solid var(--cell-border)',
+          position: 'relative',
+          ...(sangati ? { background: 'rgba(107,30,46,0.05)' } : {}),
+        }}
+      >
+        <span className={`cell-swara${isKarvai ? ' cell-karvai' : ''}`} style={sangati && !isKarvai ? { color: 'var(--burgundy)', fontStyle: 'italic' } : {}}>{swara}</span>
+        <span className="cell-sahitya">{sahitya}</span>
+      </div>
+    )
+  }
 
   return (
     <div

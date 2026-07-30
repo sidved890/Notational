@@ -94,6 +94,8 @@ export default function Editor({ cloudId, isTutorial }: Props) {
       avartanamCount: notRows.length,
       isPublic: state.isPublic || false,
       shareId: state.shareId || null,
+      creatorName: user.displayName || user.email?.split('@')[0] || 'Anonymous',
+      creatorPhotoURL: user.photoURL || null,
     }
     try {
       // Strip undefined BEFORE adding server timestamps — stripUndefined must
@@ -160,7 +162,7 @@ export default function Editor({ cloudId, isTutorial }: Props) {
         gap: 12, flexWrap: 'wrap',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <a href="/" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)' }}>← Dashboard</a>
+          <a href="/dashboard" style={{ color: 'var(--gold)', fontSize: 13, textDecoration: 'none', fontFamily: 'var(--font-ui)' }}>← Dashboard</a>
           <a href="/library" style={{ color: 'var(--ink-faint)', fontSize: 12, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Library</a>
           <a href="/tutorial" style={{ color: 'var(--ink-faint)', fontSize: 12, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>Tutorial</a>
           <a href="/about" style={{ color: 'var(--ink-faint)', fontSize: 12, textDecoration: 'none', fontFamily: 'var(--font-ui)', fontStyle: 'italic' }}>About</a>
